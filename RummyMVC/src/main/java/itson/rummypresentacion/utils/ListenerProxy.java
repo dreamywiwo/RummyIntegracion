@@ -46,7 +46,7 @@ public class ListenerProxy implements IGameGlobalListener {
         this.salaListener = null;
     }
 
-    public void activarModoSala(ISalaListener listener) { 
+    public void activarModoSala(ISalaListener listener) {
         this.salaListener = listener;
         this.registroListener = null;
         this.turnoListener = null;
@@ -74,6 +74,8 @@ public class ListenerProxy implements IGameGlobalListener {
     public void recibirMano(List<FichaDTO> mano) {
         if (turnoListener != null) {
             turnoListener.recibirMano(mano);
+        } else if (salaListener != null) {
+            salaListener.recibirMano(mano);
         }
     }
 
@@ -135,7 +137,7 @@ public class ListenerProxy implements IGameGlobalListener {
 
     @Override
     public void recibirActualizacionSala(List<JugadorDTO> jugadores) {
-        if (salaListener != null) { 
+        if (salaListener != null) {
             salaListener.recibirActualizacionSala(jugadores);
         }
     }

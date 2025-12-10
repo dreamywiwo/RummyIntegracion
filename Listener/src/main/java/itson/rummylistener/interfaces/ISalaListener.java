@@ -4,6 +4,7 @@
  */
 package itson.rummylistener.interfaces;
 
+import itson.rummydtos.FichaDTO;
 import itson.rummydtos.JugadorDTO;
 import java.util.List;
 
@@ -13,4 +14,6 @@ import java.util.List;
  */
 public interface ISalaListener {
     public abstract void recibirActualizacionSala(List<JugadorDTO> jugadores);
+    
+    public abstract void recibirMano(List<FichaDTO> mano);
 }

@@ -50,6 +50,9 @@ public interface IModeloEjercerTurno extends ISubject {
     public String getJugadorActivoId();
     
     public TipoVista getVistaActual();
+    
+    List<JugadorDTO> getJugadores(); // Lista completa con metadatos
+    int getCantidadFichasDe(String jugadorId);
 
 
 }

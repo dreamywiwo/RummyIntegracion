@@ -1,6 +1,7 @@
 package itson.solicitarinicio.modelo;
 
 import itson.producerjugador.facade.IProducerJugador;
+import itson.rummydtos.FichaDTO;
 import itson.rummydtos.JugadorDTO;
 import itson.rummylistener.interfaces.ISalaListener;
 import itson.rummypresentacion.utils.TipoVista;
@@ -9,17 +10,19 @@ import java.util.List;
 
 /**
  * Modelo del MVC de Sala de Espera (Lobby).
+ *
  * @author Dana Chavez
  */
 public class ModeloSalaEspera implements IModeloSalaEspera, ISubjectSalaEspera, ISalaListener {
 
     private IProducerJugador producer;
     private List<IObserverSalaEspera> observers;
-    
+
     // ESTADO
     private List<JugadorDTO> jugadoresEnSala;
     private TipoVista vistaActual;
-    private String miIdLocal; // ID propio para la UI
+    private String miIdLocal; 
+    private boolean juegoIniciado = false;
 
     public ModeloSalaEspera(IProducerJugador producer) {
         this.producer = producer;
@@ -28,7 +31,6 @@ public class ModeloSalaEspera implements IModeloSalaEspera, ISubjectSalaEspera, 
     }
 
     // --- SETTERS Y LÓGICA DE CONTROL ---
-
     public void setMiIdLocal(String id) {
         this.miIdLocal = id;
     }
@@ -48,7 +50,7 @@ public class ModeloSalaEspera implements IModeloSalaEspera, ISubjectSalaEspera, 
                 // Si no lo tienes, deberás agregarlo (envía un evento SolicitarInicioEvent)
                 // producer.solicitarInicioPartida(); 
                 System.out.println("[ModeloSala] Solicitando inicio al servidor...");
-                
+
                 // TEMPORAL: Si aún no tienes el evento de red implementado, 
                 // puedes simular que avanza (solo para probar la UI localmente)
                 // setVistaActual(null); 
@@ -65,7 +67,15 @@ public class ModeloSalaEspera implements IModeloSalaEspera, ISubjectSalaEspera, 
             e.printStackTrace();
         }
     }
-    
+
+    public void enviarEstoyListo(String miId) {
+        try {
+            producer.enviarJugadorListo(miId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public void actualizarListaJugadores(List<JugadorDTO> listaActualizada) {
         this.jugadoresEnSala = new ArrayList<>(listaActualizada);
         notificarObservers();
@@ -75,23 +85,32 @@ public class ModeloSalaEspera implements IModeloSalaEspera, ISubjectSalaEspera, 
         // Evitamos duplicados por si acaso
         boolean existe = jugadoresEnSala.stream()
                 .anyMatch(j -> j.getId().equals(jugador.getId()));
-        
+
         if (!existe) {
             jugadoresEnSala.add(jugador);
             notificarObservers();
         }
     }
-    
+
     @Override
     public void recibirActualizacionSala(List<JugadorDTO> jugadores) {
         System.out.println("[ModeloSala] Recibida lista de " + jugadores.size() + " jugadores.");
-        
-        this.jugadoresEnSala = new ArrayList<>(jugadores); 
-        notificarObservers(); 
+
+        this.jugadoresEnSala = new ArrayList<>(jugadores);
+        notificarObservers();
     }
+    
+    @Override
+    public void recibirMano(List<FichaDTO> mano) {
+        System.out.println("[ModeloSala] ¡Mano recibida! El juego ha iniciado.");
+        
+        this.juegoIniciado = true;
+        cambiarVista(null); 
+    }
+    
+
 
     // --- Getters para la Vista ---
-
     @Override
     public List<JugadorDTO> getJugadoresEnSala() {
         return jugadoresEnSala;
@@ -106,9 +125,13 @@ public class ModeloSalaEspera implements IModeloSalaEspera, ISubjectSalaEspera, 
     public String getMiId() {
         return miIdLocal;
     }
-
+    
+    @Override
+    public boolean isJuegoIniciado() {
+        return juegoIniciado;
+    }
+    
     // --- OBSERVER ---
-
     @Override
     public void suscribir(IObserverSalaEspera observer) {
         if (!observers.contains(observer)) {
@@ -122,6 +145,5 @@ public class ModeloSalaEspera implements IModeloSalaEspera, ISubjectSalaEspera, 
             observer.update(this);
         }
     }
-
 
 }

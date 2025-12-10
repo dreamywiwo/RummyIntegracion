@@ -37,4 +37,6 @@ public interface IDominio {
     public void procesarSolicitudUnion(String jugadorId);
 
     public void procesarSolicitudInfoSala(String jugadorId);
+
+    public void procesarJugadorListo(String jugadorId);
 }

@@ -40,14 +40,12 @@ public class ControladorSalaEspera {
     }
 
     public void clickComenzarPartida() {
-        // Lógica para pedir inicio al server
-        System.out.println("Solicitando inicio de partida...");
-        modelo.solicitarInicioJuego();
+        System.out.println("[CtrlSala] Enviando estado LISTO al servidor...");
+        String miId = sesion.getJugadorLocal().getId();
+        modelo.enviarEstoyListo(miId);
     }
     
-    // Este método se llamará cuando el Server diga "Juego Iniciado"
     public void irAlTablero() {
-        modelo.cambiarVista(null); // Ocultar sala
         if (siguienteControlador != null) {
             siguienteControlador.iniciarJuego();
         }

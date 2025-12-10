@@ -12,15 +12,17 @@ import java.util.List;
  *
  * @author Dana Chavez
  */
-public class JugadorDTO implements Serializable{
+public class JugadorDTO implements Serializable {
 
     private String id;
-    private String nombre;          
-    private String avatarPath;     
-    private boolean esTurno;       
-    private int cantidadFichas;     
+    private String nombre;
+    private String avatarPath;
+    private boolean esTurno;
+    private int cantidadFichas;
     private List<FichaDTO> fichasMano;
     private List<String> coloresFichas;
+
+    private boolean listo = false;
 
     public JugadorDTO() {
         this.fichasMano = new ArrayList<>();
@@ -98,7 +100,7 @@ public class JugadorDTO implements Serializable{
             this.cantidadFichas = fichasMano.size();
         }
     }
-    
+
     public List<String> getColoresFichas() {
         return coloresFichas;
     }
@@ -106,7 +108,15 @@ public class JugadorDTO implements Serializable{
     public void setColoresFichas(List<String> coloresFichas) {
         this.coloresFichas = coloresFichas;
     }
-    
+
+    public boolean isListo() {
+        return listo;
+    }
+
+    public void setListo(boolean listo) {
+        this.listo = listo;
+    }
+
     @Override
     public String toString() {
         return "JugadorDTO{" + "nombre=" + nombre + ", avatar=" + avatarPath + ", colores=" + coloresFichas + '}';

@@ -22,6 +22,7 @@ public class UI_SalaEspera extends javax.swing.JFrame implements IObserverSalaEs
 
     private ControladorSalaEspera controlador;
     private JPanel[] panelesOponentes;
+    private boolean navegando = false;
 
     public UI_SalaEspera(ControladorSalaEspera controlador) {
         initComponents();
@@ -117,15 +118,25 @@ public class UI_SalaEspera extends javax.swing.JFrame implements IObserverSalaEs
 
         jButtonComenzar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/boton_comenzar.png"))); // NOI18N
         jButtonComenzar.setBorder(null);
+        jButtonComenzar.setBorderPainted(false);
         jButtonComenzar.setContentAreaFilled(false);
         jButtonComenzar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        getContentPane().add(jButtonComenzar, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 380, 400, -1));
+        jButtonComenzar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonComenzarActionPerformed(evt);
+            }
+        });
+        getContentPane().add(jButtonComenzar, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 380, 390, -1));
 
         jLabelFondo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/fondo_sala.png"))); // NOI18N
         getContentPane().add(jLabelFondo, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButtonComenzarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonComenzarActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButtonComenzarActionPerformed
 
     /**
      * @param args the command line arguments
@@ -146,12 +157,19 @@ public class UI_SalaEspera extends javax.swing.JFrame implements IObserverSalaEs
 
         SwingUtilities.invokeLater(() -> {
 
-            if (modelo.getVistaActual() != TipoVista.SALA_ESPERA) {
-                this.setVisible(false);
+
+            if (modelo.getVistaActual() == null) {    
+                if (!navegando) {
+                    navegando = true; 
+                    this.setVisible(false);
+                    this.dispose();
+                    controlador.irAlTablero(); 
+                }
                 return;
-            } else {
-                this.setVisible(true);
             }
+            
+            navegando = false; 
+            this.setVisible(true);
 
             limpiarPaneles();
 
@@ -160,11 +178,17 @@ public class UI_SalaEspera extends javax.swing.JFrame implements IObserverSalaEs
 
             int oponenteIndex = 0;
 
+            boolean yoEstoyListo = false;
+
             for (JugadorDTO j : jugadores) {
                 PanelJugadorSala panelVisual = new PanelJugadorSala(j);
 
                 if (j.getId().equals(miId)) {
                     jPanelJugadorLocal.add(panelVisual, BorderLayout.CENTER);
+
+                    if (j.isListo()) {
+                        yoEstoyListo = true;
+                    }
                 } else {
                     if (oponenteIndex < panelesOponentes.length) {
                         panelesOponentes[oponenteIndex].add(panelVisual, BorderLayout.CENTER);
@@ -173,13 +197,14 @@ public class UI_SalaEspera extends javax.swing.JFrame implements IObserverSalaEs
                 }
             }
 
-            boolean puedeIniciar = jugadores.size() >= 2;
-            jButtonComenzar.setEnabled(puedeIniciar);
+            boolean hayMinimoJugadores = jugadores.size() >= 2;
 
-            if (puedeIniciar) {
-                jButtonComenzar.setText("COMENZAR PARTIDA");
+            if (!hayMinimoJugadores) {
+                jButtonComenzar.setEnabled(false);
+            } else if (yoEstoyListo) {
+                jButtonComenzar.setEnabled(false); 
             } else {
-                jButtonComenzar.setText("Esperando jugadores...");
+                jButtonComenzar.setEnabled(true);
             }
 
             this.revalidate();

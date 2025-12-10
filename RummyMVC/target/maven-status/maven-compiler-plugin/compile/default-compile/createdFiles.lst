@@ -29,6 +29,7 @@ itson\configurarpartida\vista\UI_ConfigurarPartida$1.class
 itson\rummypresentacion\utils\SlideWrapper.class
 itson\ejercerturno\vista\UI_Ficha$1.class
 itson\registrarjugador\vista\PanelConfirmacion.class
+itson\solicitarinicio\vista\UI_SalaEspera$1.class
 itson\ejercerturno\vista\UI_Ficha$2$1.class
 itson\registrarjugador\vista\PanelRegistro.class
 itson\ejercerturno\controlador\ControladorTurno.class

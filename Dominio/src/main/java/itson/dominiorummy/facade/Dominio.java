@@ -620,13 +620,12 @@ public class Dominio implements IDominio {
 
         System.out.println("[DOMINIO] Perfil actualizado para: " + nombre);
 
-        long jugadoresListos = jugadores.values().stream()
-                .filter(j -> j.getNombre() != null && !j.getNombre().isEmpty())
-                .count();
-
-        if (jugadoresListos >= 2) {
-            System.out.println("[DOMINIO] Jugadores suficientes (" + jugadoresListos + "). Iniciando partida...");
+        if (jugadores.size() >= 4) {
+            System.out.println("[DOMINIO] Sala llena (4/4). Forzando 'Listo' a todos e iniciando.");
+            jugadores.values().forEach(j -> j.setListo(true));
             prepararYArrancarJuego();
+        } else {
+            enviarEstadoSalaATodos();
         }
     }
 
@@ -640,6 +639,7 @@ public class Dominio implements IDominio {
                 dto.setNombre(j.getNombre());
                 dto.setAvatarPath(j.getAvatarPath());
                 dto.setColoresFichas(j.getColoresFichas());
+                dto.setListo(j.isListo());
                 listaDTOs.add(dto);
             }
         }
@@ -715,5 +715,31 @@ public class Dominio implements IDominio {
         }
 
         producer.enviarActualizacionSala(listaDTOs); 
+    }
+
+    public void procesarJugadorListo(String jugadorId) {
+        Jugador j = getJugadorById(jugadorId);
+        if (j != null) {
+            j.setListo(true);
+            System.out.println("[DOMINIO] Jugador " + j.getNombre() + " está LISTO.");
+        }
+
+        verificarInicioDeJuego();
+    }
+
+    private void verificarInicioDeJuego() {
+        if (jugadores.size() < 2) { 
+             enviarEstadoSalaATodos();
+             return;
+        }
+
+        boolean todosListos = jugadores.values().stream().allMatch(Jugador::isListo);
+
+        if (todosListos) {
+            System.out.println("[DOMINIO] ¡Todos están listos! Iniciando partida...");
+            prepararYArrancarJuego();
+        } else {
+            enviarEstadoSalaATodos();
+        }
     }
 }

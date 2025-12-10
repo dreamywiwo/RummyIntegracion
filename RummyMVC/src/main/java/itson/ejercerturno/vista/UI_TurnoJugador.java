@@ -12,12 +12,11 @@ import itson.ejercerturno.modelo.IObserver;
 import itson.rummypresentacion.utils.SlideWrapper;
 import itson.rummypresentacion.utils.TableroSlideWrapper;
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.util.List;
-import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import itson.ejercerturno.modelo.IModeloEjercerTurno;
 import itson.rummypresentacion.utils.TipoVista;
+import javax.swing.JPanel;
 
 /**
  *
@@ -101,9 +100,9 @@ public class UI_TurnoJugador extends javax.swing.JFrame implements IObserver {
     public void notificarGrupoActualizado(String idGrupo, List<FichaDTO> fichas) {
         controlador.actualizarGrupo(idGrupo, fichas);
     }
-    
+
     public void solicitarDevolverFicha(String grupoId, String fichaId) {
-        controlador.devolverFicha(grupoId, fichaId); 
+        controlador.devolverFicha(grupoId, fichaId);
     }
 
     public UI_Tablero getUITablero() {
@@ -180,20 +179,9 @@ public class UI_TurnoJugador extends javax.swing.JFrame implements IObserver {
 
         uiJugadorActual = new UI_Jugador(jugadorLocal.getNombre(), jugadorLocal.getAvatarPath());
         uiJugadorActual.setEsTurno(false);
-        uiJugadorActual.setNumeroFichas(14); 
-        jPanelContenedorJugador.add(uiJugadorActual, java.awt.BorderLayout.CENTER);
+        jPanelContenedorJugador.add(uiJugadorActual, BorderLayout.CENTER);
 
-        String avatarRival = "/imageBun.png".equals(jugadorLocal.getAvatarPath())
-                ? "/imageFish.png" : "/imageBun.png";
-
-        uiJugadorOponente = new UI_Jugador("Rival", avatarRival);
-        uiJugadorOponente.setEsTurno(false);
-        uiJugadorOponente.setNumeroFichas(14);
-
-        jPanelContenedorJugador1.add(uiJugadorOponente, java.awt.BorderLayout.CENTER);
-
-        jPanelContenedorJugador1.setVisible(true);
-
+        jPanelContenedorJugador1.setVisible(false);
         jPanelContenedorJugador2.setVisible(false);
         jPanelContenedorJugador3.setVisible(false);
 
@@ -418,13 +406,13 @@ public class UI_TurnoJugador extends javax.swing.JFrame implements IObserver {
     public void update(IModeloEjercerTurno modelo) {
         System.out.println("UI RECIBIÓ ACTUALIZACIÓN para " + jugadorID);
         SwingUtilities.invokeLater(() -> {
-            
+
             if (modelo.getVistaActual() == TipoVista.TABLERO_JUEGO) {
                 this.setVisible(true);
             } else {
                 this.setVisible(false);
             }
-            
+
             JugadorDTO ganador = modelo.getGanador();
 
             if (ganador != null) {
@@ -460,8 +448,10 @@ public class UI_TurnoJugador extends javax.swing.JFrame implements IObserver {
                 uiMano.setFichas(fichasMano);
                 uiMano.actualizarEstado(esMiTurno);
             }
+            actualizarEstadoBotones(esMiTurno);
 
             actualizarEstadoBotones(modelo);
+            actualizarOponentesVisuales(modelo);
 
             if (uiJugadorActual != null) {
                 uiJugadorActual.setEsTurno(modelo.esTurnoDe(jugadorID));
@@ -523,6 +513,45 @@ public class UI_TurnoJugador extends javax.swing.JFrame implements IObserver {
                 ultimoMensajeError = mensajeError;
             }
         });
+    }
+
+    private void actualizarOponentesVisuales(IModeloEjercerTurno modelo) {
+        List<JugadorDTO> rivales = modelo.getOtrosJugadores();
+
+        java.util.Map<String, Integer> mapaFichas = modelo.getMapaFichasOponentes();
+
+        javax.swing.JPanel[] panelesRivales = {
+            jPanelContenedorJugador1,
+            jPanelContenedorJugador2,
+            jPanelContenedorJugador3
+        };
+
+        int indexPanel = 0;
+
+        for (javax.swing.JPanel p : panelesRivales) {
+            p.removeAll();
+        }
+
+        for (JugadorDTO rival : rivales) {
+            if (indexPanel < panelesRivales.length) {
+                UI_Jugador uiRival = new UI_Jugador(rival.getNombre(), rival.getAvatarPath());
+
+                uiRival.setEsTurno(modelo.esTurnoDe(rival.getId()));
+
+                Integer numFichas = mapaFichas.get(rival.getId());
+                uiRival.setNumeroFichas(numFichas != null ? numFichas : 0);
+
+                panelesRivales[indexPanel].setLayout(new java.awt.BorderLayout());
+                panelesRivales[indexPanel].add(uiRival, java.awt.BorderLayout.CENTER);
+                panelesRivales[indexPanel].setVisible(true);
+
+                indexPanel++;
+            }
+        }
+
+        for (int i = indexPanel; i < panelesRivales.length; i++) {
+            panelesRivales[i].setVisible(false);
+        }
     }
 
     /**

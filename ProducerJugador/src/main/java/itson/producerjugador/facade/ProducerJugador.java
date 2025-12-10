@@ -86,4 +86,9 @@ public class ProducerJugador implements IProducerJugador {
         registrarJugadorEmitter.emitirInfoSalaSolicitadaEvent(id);
     }
 
+    @Override
+    public void enviarJugadorListo(String jugadorId) {
+        registrarJugadorEmitter.emitirJugadorListoEvent(jugadorId);
+    }
+
 }

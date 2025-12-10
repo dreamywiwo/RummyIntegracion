@@ -11,6 +11,7 @@ import itson.rummyeventos.acciones.FichaTomadaEvent;
 import itson.rummyeventos.acciones.GrupoActualizadoEvent;
 import itson.rummyeventos.acciones.GrupoCreadoEvent;
 import itson.rummyeventos.acciones.InfoSalaSolicitadaEvent;
+import itson.rummyeventos.acciones.JugadorListoEvent;
 import itson.rummyeventos.acciones.PartidaConfiguradaEvent;
 import itson.rummyeventos.acciones.PerfilActualizadoEvent;
 import itson.rummyeventos.acciones.TerminoTurnoEvent;
@@ -46,6 +47,7 @@ public class EventMapper {
         register("perfil.actualizado", this::handlePerfilActualizado);
         register("solicitud.unirse", this::handleSolicitudUnion);
         register("info.sala.solicitada", this::handleInfoSalaSolicitada);
+        register("jugador.listo", this::handleJugadorListo);
     }
 
     public void register(String eventType, BiConsumer<String, ISerializer> handler) {
@@ -149,13 +151,22 @@ public class EventMapper {
     }
 
     private void handleInfoSalaSolicitada(String rawPayload, ISerializer serializer) {
-
         try {
             InfoSalaSolicitadaEvent event = serializer.deserialize(rawPayload, InfoSalaSolicitadaEvent.class);
             dominio.procesarSolicitudInfoSala(event.getJugadorId());
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void handleJugadorListo(String rawPayload, ISerializer serializer) {
+        try {
+            JugadorListoEvent event = serializer.deserialize(rawPayload, JugadorListoEvent.class);
+            dominio.procesarJugadorListo(event.getJugadorId());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
 }

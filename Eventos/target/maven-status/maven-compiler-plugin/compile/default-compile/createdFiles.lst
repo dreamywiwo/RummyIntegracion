@@ -3,6 +3,7 @@ itson\rummyeventos\acciones\GrupoActualizadoEvent.class
 itson\rummyeventos\actualizaciones\TableroActualizadoEvent.class
 itson\rummyeventos\acciones\FichaDevueltaEvent.class
 itson\rummyeventos\acciones\GrupoCreadoEvent.class
+itson\rummyeventos\acciones\JugadorListoEvent.class
 itson\rummyeventos\actualizaciones\ManoActualizadaEvent.class
 itson\rummyeventos\acciones\PerfilActualizadoEvent.class
 itson\rummyeventos\acciones\InfoSalaSolicitadaEvent.class

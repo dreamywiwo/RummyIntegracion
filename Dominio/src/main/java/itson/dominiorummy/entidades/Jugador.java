@@ -12,22 +12,24 @@ import java.util.UUID;
  *
  * @author victoria
  */
-
 public class Jugador {
+
     private final String id;
     private String nombre;
 
     private final Mano mano;
 
-    private boolean yaBajo30;       
-    private boolean haTerminado;   
-    private boolean enTurno;    
-    
+    private boolean yaBajo30;
+    private boolean haTerminado;
+    private boolean enTurno;
+
     private boolean haTomadoFicha;
-    
+
     private String avatarPath;
     private List<String> coloresFichas;
-    
+
+    private boolean listo = false;
+
     public Jugador() {
         this.id = UUID.randomUUID().toString();
         this.mano = new Mano();
@@ -64,7 +66,7 @@ public class Jugador {
     public String getNombre() {
         return nombre;
     }
-    
+
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
@@ -96,7 +98,7 @@ public class Jugador {
     public void setEnTurno(boolean enTurno) {
         this.enTurno = enTurno;
     }
-    
+
     public boolean haTomadoFicha() {
         return haTomadoFicha;
     }
@@ -124,7 +126,15 @@ public class Jugador {
     public void reiniciarEstadoTurno() {
         this.haTomadoFicha = false;
     }
-    
+
+    public boolean isListo() {
+        return listo;
+    }
+
+    public void setListo(boolean listo) {
+        this.listo = listo;
+    }
+
     /**
      * Calcula los puntos de la mano actual (sirve para final de partida).
      */
@@ -136,12 +146,12 @@ public class Jugador {
 
     @Override
     public String toString() {
-        return "Jugador{" +
-                "id='" + id + '\'' +
-                ", nombre='" + nombre + '\'' +
-                ", fichasEnMano=" + mano.getFichas().size() +
-                ", yaBajo30=" + yaBajo30 +
-                ", enTurno=" + enTurno +
-                '}';
+        return "Jugador{"
+                + "id='" + id + '\''
+                + ", nombre='" + nombre + '\''
+                + ", fichasEnMano=" + mano.getFichas().size()
+                + ", yaBajo30=" + yaBajo30
+                + ", enTurno=" + enTurno
+                + '}';
     }
 }

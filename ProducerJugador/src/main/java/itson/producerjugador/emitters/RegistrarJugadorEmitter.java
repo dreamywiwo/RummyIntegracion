@@ -6,6 +6,7 @@ package itson.producerjugador.emitters;
 
 import com.mycompany.conexioninterfaces.IDispatcher;
 import itson.rummyeventos.acciones.InfoSalaSolicitadaEvent;
+import itson.rummyeventos.acciones.JugadorListoEvent;
 import itson.rummyeventos.acciones.PerfilActualizadoEvent;
 import itson.rummyeventos.acciones.UnirsePartidaEvent;
 import itson.serializer.implementacion.JsonSerializer;
@@ -33,6 +34,11 @@ public class RegistrarJugadorEmitter extends BaseEmitter {
 
     public void emitirInfoSalaSolicitadaEvent(String id) {
         InfoSalaSolicitadaEvent event = new InfoSalaSolicitadaEvent(id);
+        enviarEvento(event);
+    }
+
+    public void emitirJugadorListoEvent(String jugadorId) {
+        JugadorListoEvent event = new JugadorListoEvent(jugadorId);
         enviarEvento(event);
     }
     

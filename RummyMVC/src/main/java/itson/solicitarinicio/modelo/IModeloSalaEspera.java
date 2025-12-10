@@ -19,4 +19,6 @@ public interface IModeloSalaEspera {
     public abstract TipoVista getVistaActual();
     
     public abstract String getMiId();
+    
+    public abstract boolean isJuegoIniciado();
 }

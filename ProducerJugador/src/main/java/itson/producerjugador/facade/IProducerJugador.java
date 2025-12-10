@@ -34,4 +34,6 @@ public interface IProducerJugador {
     public abstract void solicitarUnirsePartida(String jugadorId);
     
     public abstract void solicitarInfoSala(String id);
+    
+    public abstract void enviarJugadorListo(String jugadorId);
 }
