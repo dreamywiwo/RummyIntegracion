@@ -1,0 +1,4 @@
+com\mycompany\broker\Broker.class
+com\mycompany\broker\ProcesadorEventosBroker.class
+interfaces\IBroker.class
+com\mycompany\broker\SubscriptionRegistry.class

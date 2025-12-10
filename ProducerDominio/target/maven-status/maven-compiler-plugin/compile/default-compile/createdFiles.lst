@@ -1,0 +1,5 @@
+itson\producerdominio\emitters\InicializarJuegoEmitter.class
+itson\producerdominio\facade\ProducerDominio.class
+itson\producerdominio\emitters\BaseEmitter.class
+itson\producerdominio\emitters\EstadoJuegoEmitter.class
+itson\producerdominio\facade\IProducerDominio.class

@@ -1,0 +1,16 @@
+itson\dominiorummy\entidades\Partida$EstadoPartida.class
+itson\dominiorummy\facade\Dominio.class
+itson\dominiorummy\entidades\Sopa.class
+itson\dominiorummy\entidades\GrupoSecuencia.class
+itson\dominiorummy\entidades\Grupo.class
+itson\dominiorummy\facade\IDominio.class
+itson\dominiorummy\mappers\FichaMapper.class
+itson\dominiorummy\entidades\Partida.class
+itson\dominiorummy\entidades\FichaPlaced.class
+itson\dominiorummy\entidades\Ficha.class
+itson\dominiorummy\entidades\Tablero.class
+itson\dominiorummy\entidades\Jugador.class
+itson\dominiorummy\entidades\Mano.class
+itson\dominiorummy\entidades\Turno.class
+itson\dominiorummy\mappers\TableroMapper.class
+itson\dominiorummy\entidades\GrupoNumero.class

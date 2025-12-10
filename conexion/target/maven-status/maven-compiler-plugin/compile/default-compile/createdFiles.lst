@@ -1,0 +1,10 @@
+claseReceptor\ColaReceptor.class
+claseReceptor\Receptor.class
+claseReceptor\SocketIN$ClienteHandler.class
+com\mycompany\conexion\Conexion.class
+ClaseDispatcher\SocketOut.class
+interfaces\IDispatcherObserver.class
+ClaseDispatcher\ColaDispatcher.class
+claseReceptor\SocketIN.class
+interfaces\IReceptorObserver.class
+ClaseDispatcher\Dispatcher.class
