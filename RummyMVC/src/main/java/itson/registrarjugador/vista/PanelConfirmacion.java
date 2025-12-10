@@ -18,33 +18,30 @@ public class PanelConfirmacion extends JPanel {
 
     public PanelConfirmacion(ControladorRegistro controlador) {
         this.controlador = controlador;
-        imagenFondo = cargarImagen("background.png");
-        initComponents();
+        this.imagenFondo = cargarImagen("background.png");
+
+        setLayout(new GridBagLayout()); 
     }
     
-    private Image cargarImagen(String nombre) {
-        try {
-            URL url = getClass().getResource("/" + nombre);
-            return (url != null) ? new ImageIcon(url).getImage() : null;
-        } catch (Exception e) { return null; }
-    }
-
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        if (imagenFondo != null) g.drawImage(imagenFondo, 0, 0, getWidth(), getHeight(), this);
-    }
-
-    private void initComponents() {
-        setLayout(new GridBagLayout()); 
+    /**
+     * Este método debe ser llamado justo antes de mostrar el panel.
+     * Borra la interfaz anterior y la reconstruye con los datos actuales del modelo.
+     */
+    public void actualizarDatos() {
+        this.removeAll();
         
+        JugadorDTO dto = controlador.getModelo().getJugadorTemporal();
+        
+        if (dto == null) {
+            revalidate();
+            repaint();
+            return;
+        }
+
         JPanel panelContenido = new JPanel();
         panelContenido.setLayout(new BoxLayout(panelContenido, BoxLayout.Y_AXIS));
         panelContenido.setBackground(colorFondoPanel);
         panelContenido.setBorder(BorderFactory.createEmptyBorder(40, 80, 40, 80));
-        
-        // OBTENER DATOS DEL MODELO
-        JugadorDTO dto = controlador.getModelo().getJugadorTemporal();
 
         JLabel lblTitulo = new JLabel("CONFIRMAR DATOS");
         lblTitulo.setFont(fontTitulo);
@@ -53,7 +50,7 @@ public class PanelConfirmacion extends JPanel {
         panelContenido.add(Box.createRigidArea(new Dimension(0, 30)));
 
         Image imgAvatar = cargarImagen(dto.getAvatarPath());
-        if(imgAvatar != null) {
+        if (imgAvatar != null) {
             AvatarComponent avatarShow = new AvatarComponent(dto.getAvatarPath(), imgAvatar, null);
             JPanel pCenter = new JPanel(new FlowLayout(FlowLayout.CENTER));
             pCenter.setOpaque(false);
@@ -61,8 +58,9 @@ public class PanelConfirmacion extends JPanel {
             panelContenido.add(pCenter);
         }
         panelContenido.add(Box.createRigidArea(new Dimension(0, 20)));
-        
-        JLabel lblNombre = new JLabel("Jugador: " + dto.getNombre());
+
+        String nombreMostrar = (dto.getNombre() != null) ? dto.getNombre() : "---";
+        JLabel lblNombre = new JLabel("Jugador: " + nombreMostrar);
         lblNombre.setFont(fontTexto);
         lblNombre.setAlignmentX(CENTER_ALIGNMENT);
         panelContenido.add(lblNombre);
@@ -75,11 +73,18 @@ public class PanelConfirmacion extends JPanel {
         
         JPanel pnlColores = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
         pnlColores.setOpaque(false);
+        
         if (dto.getColoresFichas() != null) {
-            for(String c : dto.getColoresFichas()) {
+            for (String c : dto.getColoresFichas()) {
                 JPanel cuadrito = new JPanel();
-                if(c != null) cuadrito.setBackground(Color.decode(c));
-                cuadrito.setPreferredSize(new Dimension(40,40));
+                if (c != null) {
+                    try {
+                        cuadrito.setBackground(Color.decode(c));
+                    } catch (Exception e) {
+                        cuadrito.setBackground(Color.GRAY);
+                    }
+                }
+                cuadrito.setPreferredSize(new Dimension(40, 40));
                 cuadrito.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
                 pnlColores.add(cuadrito);
             }
@@ -100,9 +105,13 @@ public class PanelConfirmacion extends JPanel {
         pnlBotones.add(btnContinuar);
         
         panelContenido.add(pnlBotones);
+        
         add(panelContenido);
+        
+        revalidate();
+        repaint();
     }
-    
+
     private JButton crearBoton(String texto, Color colorFondo) {
         JButton btn = new JButton(texto);
         btn.setFont(fontBotones);
@@ -114,5 +123,23 @@ public class PanelConfirmacion extends JPanel {
         btn.setPreferredSize(new Dimension(140, 50));
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         return btn;
+    }
+    
+    private Image cargarImagen(String nombre) {
+        try {
+            URL url = getClass().getResource("/" + nombre);
+            if (url == null) url = getClass().getResource("/imagenes/" + nombre);
+            if (url == null) url = getClass().getResource(nombre);
+            
+            return (url != null) ? new ImageIcon(url).getImage() : null;
+        } catch (Exception e) { return null; }
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        if (imagenFondo != null) {
+            g.drawImage(imagenFondo, 0, 0, getWidth(), getHeight(), this);
+        }
     }
 }

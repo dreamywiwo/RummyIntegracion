@@ -55,6 +55,7 @@ public class UI_Registro extends JFrame implements IObserverRegistro {
                 this.revalidate();
                 this.repaint();
             } else if (vista == TipoVista.CONFIRMACION_REGISTRO) {
+                panelConfirmacion.actualizarDatos();
                 setContentPane(panelConfirmacion);
                 this.setVisible(true);
                 this.revalidate();
