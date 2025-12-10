@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package itson.ejercerturno.modelo;
 
 import itson.producerjugador.facade.IProducerJugador;
@@ -15,45 +11,56 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
- *
+ * Modelo para la lógica de juego (MVC Ejercer Turno).
  * @author Dana ChavezW
  */
 public class ModeloEjercerTurno implements IModeloEjercerTurno, ISubject, ITurnoListener {
 
     private IProducerJugador producer;
-    // Lista de observadores
     private List<IObserver> observers;
     
     private TipoVista vistaActual = TipoVista.TABLERO_JUEGO;
 
-    // Estado interno del modelo
-    private List<GrupoDTO> gruposEnTablero = new ArrayList<>();
-    private JugadorDTO jugadorActual;
-    private String jugadorActivoId;
-    private List<FichaDTO> fichasMano = new ArrayList<>();
-    private List<JugadorDTO> otrosJugadores;
-    private int fichasEnPozo;
+    private String idJugadorLocal;
+    
+    private List<GrupoDTO> gruposEnTablero;
+    private List<FichaDTO> fichasMano;
+    
+    private List<JugadorDTO> todosLosJugadores; 
+    private Map<String, Integer> fichasOponentes; 
+    
+    // Estado del Juego
+    private int fichasEnPozo = 0;
     private String turnoActual;
-    private boolean partidaTerminada;
     private JugadorDTO jugadorGanador;
+    private boolean juegoTerminado = false;
+    
+    // Estado de Acciones / Errores
     private String ultimaAccion;
     private boolean accionValida;
     private String mensajeError;
-    private boolean juegoTerminado = false;
-    private String jugadorGanadorId = null;
-    private String idJugadorLocal;
     private String grupoInvalidoId;
-    private Map<String, Integer> fichasOponentes = new HashMap<>();
 
-    // tendra al producer que se llamara para crear cada evento
     public ModeloEjercerTurno(IProducerJugador producer) {
         this.producer = producer;
         this.observers = new ArrayList<>();
+        
+        // INICIALIZACIÓN SEGURA DE LISTAS
+        this.gruposEnTablero = new ArrayList<>();
+        this.fichasMano = new ArrayList<>();
+        this.todosLosJugadores = new ArrayList<>();
+        this.fichasOponentes = new HashMap<>();
     }
 
-    // Metodos que llama el control
+    // --- MÉTODOS DE CONTROL (ACCIONES) ---
+
+    public void setJugadorLocal(String idJugador) {
+        this.idJugadorLocal = idJugador;
+    }
+
     public void cambiarVista(TipoVista nuevaVista) {
         this.vistaActual = nuevaVista;
         this.mensajeError = null;
@@ -80,14 +87,17 @@ public class ModeloEjercerTurno implements IModeloEjercerTurno, ISubject, ITurno
         producer.devolverFicha(grupoId, fichaId);
     }
     
-    
     public void solicitarSincronizacion() {
-        producer.solicitarEstadoJuego(this.idJugadorLocal);
+        if (idJugadorLocal != null) {
+            producer.solicitarEstadoJuego(this.idJugadorLocal);
+        }
     }
 
-    // Implementacion de IModelo
+    // --- IMPLEMENTACIÓN IModeloEjercerTurno (GETTERS SEGUROS) ---
+
     @Override
     public List<GrupoDTO> getGruposEnTablero() {
+        if (gruposEnTablero == null) return new ArrayList<>();
         synchronized (this) {
             return new ArrayList<>(gruposEnTablero);
         }
@@ -95,17 +105,40 @@ public class ModeloEjercerTurno implements IModeloEjercerTurno, ISubject, ITurno
 
     @Override
     public JugadorDTO getJugadorActual() {
-        return jugadorActual;
+        // Busca en la lista completa al jugador local
+        if (todosLosJugadores != null && idJugadorLocal != null) {
+            return todosLosJugadores.stream()
+                    .filter(j -> j.getId().equals(idJugadorLocal))
+                    .findFirst()
+                    .orElse(null);
+        }
+        return null;
     }
 
     @Override
     public List<FichaDTO> getFichasMano() {
+        if (fichasMano == null) return new ArrayList<>();
         return new ArrayList<>(this.fichasMano);
     }
 
     @Override
     public List<JugadorDTO> getOtrosJugadores() {
-        return new ArrayList<>(otrosJugadores);
+        if (todosLosJugadores == null) {
+            return new ArrayList<>();
+        }
+        // Filtramos para devolver todos MENOS yo
+        if (idJugadorLocal != null) {
+            return todosLosJugadores.stream()
+                    .filter(j -> !j.getId().equals(idJugadorLocal))
+                    .collect(Collectors.toList());
+        }
+        return new ArrayList<>(todosLosJugadores);
+    }
+
+    @Override
+    public Map<String, Integer> getMapaFichasOponentes() {
+        if (fichasOponentes == null) return new HashMap<>();
+        return new HashMap<>(fichasOponentes);
     }
 
     @Override
@@ -120,7 +153,7 @@ public class ModeloEjercerTurno implements IModeloEjercerTurno, ISubject, ITurno
 
     @Override
     public boolean isPartidaTerminada() {
-        return partidaTerminada;
+        return juegoTerminado;
     }
 
     @Override
@@ -150,11 +183,7 @@ public class ModeloEjercerTurno implements IModeloEjercerTurno, ISubject, ITurno
 
     @Override
     public String getJugadorGanadorId() {
-        return jugadorGanadorId;
-    }
-
-    public void setJugadorLocal(String idJugador) {
-        this.idJugadorLocal = idJugador;
+        return (jugadorGanador != null) ? jugadorGanador.getId() : null;
     }
 
     @Override
@@ -169,12 +198,7 @@ public class ModeloEjercerTurno implements IModeloEjercerTurno, ISubject, ITurno
 
     @Override
     public String getJugadorActivoId() {
-        return jugadorActivoId;
-    }
-
-    @Override
-    public Map<String, Integer> getMapaFichasOponentes() {
-        return new HashMap<>(fichasOponentes);
+        return turnoActual;
     }
     
     @Override
@@ -182,7 +206,82 @@ public class ModeloEjercerTurno implements IModeloEjercerTurno, ISubject, ITurno
         return vistaActual;
     }
 
-    // OBSERVER
+    @Override
+    public boolean esTurnoDe(String jugadorID) {
+        return turnoActual != null && turnoActual.equals(jugadorID);
+    }
+
+    public void actualizarListaJugadores(List<JugadorDTO> lista) {
+        if (lista != null) {
+            this.todosLosJugadores = new ArrayList<>(lista);
+            
+            for (JugadorDTO j : lista) {
+                if (!fichasOponentes.containsKey(j.getId())) {
+                    fichasOponentes.put(j.getId(), 14); 
+                }
+            }
+            notificarObservers();
+        }
+    }
+
+    @Override
+    public void terminoTurno(String jugadorActivoId) {
+        this.turnoActual = jugadorActivoId;
+        notificarObservers();
+    }
+
+    @Override
+    public void recibirTablero(TableroDTO tableroDTO) {
+        if (tableroDTO != null && tableroDTO.getGrupos() != null) {
+            this.gruposEnTablero = new ArrayList<>(tableroDTO.getGrupos());
+            this.grupoInvalidoId = null;
+            notificarObservers();
+        }
+    }
+
+    @Override
+    public void recibirMano(List<FichaDTO> mano) {
+        if (mano != null) {
+            this.fichasMano = new ArrayList<>(mano); // Copia defensiva
+        }
+        notificarObservers();
+    }
+
+    @Override
+    public void recibirSopa(int cantidad) {
+        this.fichasEnPozo = cantidad;
+        notificarObservers();
+    }
+
+    @Override
+    public void recibirError(String mensaje) {
+        this.mensajeError = mensaje;
+        notificarObservers();
+    }
+
+    @Override
+    public void marcarJuegoTerminado(JugadorDTO ganador) {
+        this.juegoTerminado = true;
+        this.jugadorGanador = ganador;
+        notificarObservers();
+    }
+
+    @Override
+    public void resaltarGrupoInvalido(String grupoId) {
+        this.grupoInvalidoId = grupoId;
+        notificarObservers();
+    }
+
+    @Override
+    public void actualizarFichasOponente(String jugadorId, int size) {
+        if (fichasOponentes != null) {
+            fichasOponentes.put(jugadorId, size);
+            notificarObservers();
+        }
+    }
+
+    // --- OBSERVER PATTERN ---
+
     @Override
     public void suscribir(IObserver observer) {
         if (!observers.contains(observer)) {
@@ -201,77 +300,4 @@ public class ModeloEjercerTurno implements IModeloEjercerTurno, ISubject, ITurno
             observer.update(this);
         }
     }
-
-    @Override
-    public void terminoTurno(String jugadorActivoId) {
-        this.turnoActual = jugadorActivoId;
-        notificarObservers();
-    }
-
-    @Override
-    public void recibirTablero(TableroDTO tableroDTO) {
-        if (tableroDTO != null && tableroDTO.getGrupos() != null) {
-            this.gruposEnTablero = new ArrayList<>(tableroDTO.getGrupos());
-
-            this.grupoInvalidoId = null;
-
-            notificarObservers();
-        }
-    }
-
-    @Override
-    public void recibirMano(List<FichaDTO> mano) {
-        if (mano != null) {
-            this.fichasMano = mano;
-
-            if (this.jugadorActual != null) {
-                jugadorActual.setFichasMano(fichasMano);
-            }
-        }
-
-        notificarObservers();
-    }
-
-    @Override
-    public void recibirSopa(int cantidad) {
-        this.fichasEnPozo = cantidad;
-        notificarObservers();
-    }
-
-    @Override
-    public void recibirError(String mensaje) {
-        this.mensajeError = mensaje;
-        notificarObservers();
-    }
-
-    @Override
-    public boolean esTurnoDe(String jugadorID) {
-        if (turnoActual != null && turnoActual.equals(jugadorID)) {
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public void marcarJuegoTerminado(JugadorDTO ganador) {
-        this.juegoTerminado = true;
-        this.jugadorGanador = ganador;
-
-        notificarObservers();
-    }
-
-    @Override
-    public void resaltarGrupoInvalido(String grupoId) {
-        this.grupoInvalidoId = grupoId;
-
-        notificarObservers();
-    }
-
-    @Override
-    public void actualizarFichasOponente(String jugadorId, int size) {
-        fichasOponentes.put(jugadorId, size);
-        notificarObservers();
-    }
-
-
 }

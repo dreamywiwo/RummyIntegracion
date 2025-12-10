@@ -170,50 +170,46 @@ public class Dominio implements IDominio {
             return;
         }
 
-        // if (jugadores.size() < 2) return;
-        int comodines = partida.getCantidadComodines();
-        if (comodines <= 0) {
-            comodines = 2;
-        }
-        List<Ficha> mazoNuevo = generarFichasRummy(comodines);
+        int rangoMaximo = partida.getMaxNumFichas(); 
+        if (rangoMaximo <= 0) rangoMaximo = 13;
 
-        // 3. Inicializar Sopa
+        int comodines = partida.getCantidadComodines();
+        if (comodines < 0) comodines = 2; // Default 2
+
+        List<Ficha> mazoNuevo = generarFichasRummy(rangoMaximo, comodines); 
+
         sopa.setFichas(mazoNuevo);
         sopa.mezclar();
 
-        // 4. Establecer Turnos
         List<Jugador> listaOrdenada = new ArrayList<>(jugadores.values());
         java.util.Collections.shuffle(listaOrdenada);
         turno.setOrdenJugadores(listaOrdenada);
         turno.setIndiceJugadorActual(0);
 
-        int fichasPorJugador = partida.getMaxNumFichas();
-        if (fichasPorJugador <= 0) {
-            fichasPorJugador = 14;
-        }
+        final int FICHAS_INICIALES = 14; 
+        
         for (Jugador j : jugadores.values()) {
             j.getMano().getFichas().clear();
-            for (int i = 0; i < fichasPorJugador; i++) {
+            for (int i = 0; i < FICHAS_INICIALES; i++) {
                 Ficha f = sopa.tomarFicha();
                 if (f != null) {
                     j.getMano().agregarFicha(f);
                 }
             }
-            System.out.println("[DOMINIO] Repartidas " + fichasPorJugador + " fichas a " + j.getNombre());
+            System.out.println("[DOMINIO] Repartidas " + FICHAS_INICIALES + " fichas a " + j.getNombre());
         }
 
         partida.marcarEnCurso();
-
         iniciarPartida();
     }
 
-    private List<Ficha> generarFichasRummy(int numComodines) {
+    private List<Ficha> generarFichasRummy(int rangoMaximo, int numComodines) {
         List<Ficha> nuevasFichas = new ArrayList<>();
         String[] colores = {"ROJO", "AZUL", "NEGRO", "AMARILLO"};
 
-        for (int set = 0; set < 2; set++) {
+        for (int set = 0; set < 2; set++) { 
             for (String color : colores) {
-                for (int numero = 1; numero <= 13; numero++) {
+                for (int numero = 1; numero <= rangoMaximo; numero++) {
                     String idUnico = java.util.UUID.randomUUID().toString();
                     nuevasFichas.add(new Ficha(idUnico, numero, color, false));
                 }
@@ -595,8 +591,8 @@ public class Dominio implements IDominio {
         Jugador jugador = getJugadorById(id);
 
         if (jugador == null) {
-            jugador = new Jugador(id, nombre); // Usamos el constructor que acepta ID
-            agregarJugador(jugador); // Lo metemos al mapa
+            jugador = new Jugador(id, nombre); 
+            agregarJugador(jugador); 
             System.out.println("[DOMINIO] Nuevo jugador detectado y creado: " + id);
         }
 

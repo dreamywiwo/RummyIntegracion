@@ -25,6 +25,7 @@ public class UI_Tablero extends javax.swing.JPanel {
     private final UI_TurnoJugador ventanaPrincipal;
     private final List<UI_Grupo> gruposVisuales = new ArrayList<>();
     private String grupoInvalidoActual = null;
+    private List<String> paletaColoresLocal;
 
     public UI_Tablero(UI_TurnoJugador ventanaPrincipal) {
         this.ventanaPrincipal = ventanaPrincipal;
@@ -36,6 +37,10 @@ public class UI_Tablero extends javax.swing.JPanel {
         setOpaque(false);
         setLayout(null);
         setPreferredSize(new Dimension(803, 448));
+    }
+    
+    public void setPaletaColoresLocal(List<String> colores) {
+        this.paletaColoresLocal = colores;
     }
 
     private void habilitarDrop() {

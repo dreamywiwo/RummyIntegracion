@@ -48,11 +48,14 @@ public class UI_TurnoJugador extends javax.swing.JFrame implements IObserver {
 
         configurarPanelSopa();
         configurarPanelesJugadores();
+        
+        List<String> misColores = jugadorLocal.getColoresFichas();
 
         PanelBloqueo glassPane = new PanelBloqueo();
         setGlassPane(glassPane);
 
         uiTablero = new UI_Tablero(this);
+        uiTablero.setPaletaColoresLocal(misColores);
         setLocationRelativeTo(null);
 
         TableroSlideWrapper tableroDraggable = new TableroSlideWrapper(uiTablero);
@@ -61,7 +64,7 @@ public class UI_TurnoJugador extends javax.swing.JFrame implements IObserver {
 
         jPanelContenedorTablero.add(tableroDraggable, BorderLayout.CENTER);
 
-        uiMano = new UI_Mano(uiTablero, null);
+        uiMano = new UI_Mano(uiTablero, null, misColores);
         SlideWrapper manoDeslizable = new SlideWrapper(uiMano);
         jPanelContenedorMano.setLayout(new BorderLayout());
         jPanelContenedorMano.add(manoDeslizable, BorderLayout.CENTER);
@@ -452,11 +455,21 @@ public class UI_TurnoJugador extends javax.swing.JFrame implements IObserver {
 
             actualizarEstadoBotones(modelo);
             actualizarOponentesVisuales(modelo);
+            
+            JugadorDTO datosLocal = modelo.getJugadorActual(); 
 
-            if (uiJugadorActual != null) {
-                uiJugadorActual.setEsTurno(modelo.esTurnoDe(jugadorID));
+            if (uiJugadorActual != null && datosLocal != null) {
+                uiJugadorActual.setNombre(datosLocal.getNombre());
+                uiJugadorActual.setAvatarPath(datosLocal.getAvatarPath());
+                
+                uiJugadorActual.setEsTurno(esMiTurno);
                 uiJugadorActual.setNumeroFichas(modelo.getFichasMano().size());
-            }
+                
+                uiJugadorActual.repaint();
+            } 
+            
+            jPanelContenedorJugador.revalidate();
+            jPanelContenedorJugador.repaint();
 
             if (uiJugadorOponente != null) {
                 uiJugadorOponente.setEsTurno(!esMiTurno);

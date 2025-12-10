@@ -5,9 +5,11 @@
 package itson.solicitarinicio.controlador;
 
 import itson.ejercerturno.controlador.ControladorTurno;
+import itson.rummydtos.JugadorDTO;
 import itson.rummypresentacion.utils.SesionCliente;
 import itson.rummypresentacion.utils.TipoVista;
 import itson.solicitarinicio.modelo.ModeloSalaEspera;
+import java.util.List;
 
 /**
  *
@@ -47,6 +49,11 @@ public class ControladorSalaEspera {
     
     public void irAlTablero() {
         if (siguienteControlador != null) {
+
+            List<JugadorDTO> jugadoresListos = modelo.getJugadoresEnSala();
+            
+            siguienteControlador.configurarJugadoresIniciales(jugadoresListos);
+            
             siguienteControlador.iniciarJuego();
         }
     }

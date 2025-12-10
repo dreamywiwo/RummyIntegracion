@@ -24,7 +24,7 @@ public class PanelConfirmacion extends JPanel {
     
     private Image cargarImagen(String nombre) {
         try {
-            URL url = getClass().getResource("/imagenes/" + nombre);
+            URL url = getClass().getResource("/" + nombre);
             return (url != null) ? new ImageIcon(url).getImage() : null;
         } catch (Exception e) { return null; }
     }

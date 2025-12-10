@@ -36,6 +36,14 @@ private ModeloEjercerTurno modelo;
         modelo.cambiarVista(TipoVista.TABLERO_JUEGO);
         modelo.solicitarSincronizacion();
     }
+    
+    /**
+     * Recibe la lista de jugadores desde la sala de espera para inicializar el modelo
+     * antes de que se abra la ventana.
+     */
+    public void configurarJugadoresIniciales(java.util.List<itson.rummydtos.JugadorDTO> jugadores) {
+        modelo.actualizarListaJugadores(jugadores);
+    }
 
     /**
      * Maneja la creación de un nuevo grupo

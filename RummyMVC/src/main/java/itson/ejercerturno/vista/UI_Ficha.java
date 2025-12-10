@@ -34,19 +34,27 @@ public class UI_Ficha extends JLabel {
 
     private boolean seleccionada = false;
     private boolean tieneError = false;
+    
+    // Lista de colores personalizados (Hex Strings)
+    private List<String> paletaColores; 
+
+    // --- CONSTRUCTORES ---
 
     public UI_Ficha(FichaDTO ficha) {
-        this(ficha, null, 1.0);
+        this(ficha, null, 1.0, null);
     }
 
     public UI_Ficha(FichaDTO ficha, ContenedorFichas contenedor) {
-        this(ficha, contenedor, 1.0);
+        this(ficha, contenedor, 1.0, null);
     }
-
-    public UI_Ficha(FichaDTO ficha, ContenedorFichas contenedor, double escalaActual) {
+    
+    // Constructor completo con paleta de colores
+    public UI_Ficha(FichaDTO ficha, ContenedorFichas contenedor, double escalaActual, List<String> paletaColores) {
         this.ficha = ficha;
         this.contenedor = contenedor;
         this.escalaActual = escalaActual;
+        this.paletaColores = paletaColores;
+        
         configurarComponente();
         habilitarDragAndDrop();
         habilitarSeleccion();
@@ -91,6 +99,8 @@ public class UI_Ficha extends JLabel {
         return seleccionada;
     }
 
+    // --- PINTURA DEL COMPONENTE ---
+
     @Override
     protected void paintComponent(Graphics g) {
         Graphics2D g2d = (Graphics2D) g.create();
@@ -103,17 +113,17 @@ public class UI_Ficha extends JLabel {
 
         int radioBordeEscalado = (int) (RADIO_BORDE * escalaActual);
         float grosorBorde = (float) (2f * escalaActual);
-
         float grosorDestacado = (float) (4f * escalaActual); 
 
-        // Sombra
+        // 1. Sombra
         g2d.setColor(new Color(0, 0, 0, 30));
         g2d.fill(new RoundRectangle2D.Float(3, 3, width - 3, height - 3, radioBordeEscalado, radioBordeEscalado));
 
-        // Fondo
+        // 2. Fondo (Usamos lógica de color de fondo)
         g2d.setColor(obtenerColorFondo());
         g2d.fill(new RoundRectangle2D.Float(0, 0, width - 3, height - 3, radioBordeEscalado, radioBordeEscalado));
 
+        // 3. Borde (Selección, Error o Normal)
         if (tieneError) {
             g2d.setColor(Color.RED);
             g2d.setStroke(new BasicStroke(grosorDestacado));
@@ -129,8 +139,88 @@ public class UI_Ficha extends JLabel {
 
         g2d.dispose();
 
+        // Dibuja el texto del JLabel encima del fondo que acabamos de pintar
         super.paintComponent(g);
     }
+
+    // --- GESTIÓN DE COLORES (SKINS) ---
+
+    private void actualizarVisual() {
+        int tamanoFuenteBase = ficha.isEsComodin() ? 36 : 32;
+        int tamanoFuenteEscalado = (int) (tamanoFuenteBase * escalaActual);
+
+        if (tamanoFuenteEscalado < 8) {
+            tamanoFuenteEscalado = 8;
+        }
+
+        if (ficha.isEsComodin()) {
+            setText("☺"); // Símbolo de comodín
+            setFont(new Font("Arial", Font.BOLD, tamanoFuenteEscalado));
+            setForeground(new Color(139, 69, 19));
+        } else {
+            setText(String.valueOf(ficha.getNumero()));
+            setFont(new Font("Arial", Font.BOLD, tamanoFuenteEscalado));
+            
+            // AQUÍ APLICAMOS EL COLOR PERSONALIZADO AL TEXTO (NÚMERO)
+            setForeground(obtenerColorTextoPersonalizado());
+        }
+        setToolTipText(ficha.toString());
+    }
+
+    /**
+     * Obtiene el color del texto basado en la paleta personalizada.
+     */
+    private Color obtenerColorTextoPersonalizado() {
+        // Si no hay paleta o es inválida, usar defaults
+        if (paletaColores == null || paletaColores.size() < 4) {
+            return obtenerColorTextoDefault();
+        }
+
+        try {
+            switch (ficha.getColor().toUpperCase()) {
+                case "ROJO":     return Color.decode(paletaColores.get(0));
+                case "AZUL":     return Color.decode(paletaColores.get(1));
+                case "NEGRO":    return Color.decode(paletaColores.get(2));
+                case "AMARILLO": return Color.decode(paletaColores.get(3));
+                default:         return new Color(139, 69, 19);
+            }
+        } catch (Exception e) {
+            // Si falla el decode del hex, volver al default
+            return obtenerColorTextoDefault();
+        }
+    }
+
+    /**
+     * Colores originales (Hardcoded) por si no hay skin.
+     */
+    private Color obtenerColorTextoDefault() {
+        switch (ficha.getColor().toUpperCase()) {
+            case "ROJO":     return new Color(220, 140, 90);
+            case "AZUL":     return new Color(100, 149, 237);
+            case "AMARILLO": return new Color(218, 165, 32);
+            case "NEGRO":    return new Color(105, 105, 105);
+            default:         return new Color(139, 69, 19);
+        }
+    }
+
+    private Color obtenerColorFondo() {
+        if (ficha.isEsComodin()) {
+            return new Color(255, 228, 181);
+        }
+        // Fondos muy claros para resaltar el texto de color
+        return new Color(255, 253, 240); 
+    }
+
+    /**
+     * El borde también se pinta del color del tema, pero con transparencia.
+     */
+    private Color obtenerColorBorde() {
+        Color baseColor = obtenerColorTextoPersonalizado();
+        // Crear un color semitransparente (alpha 150) basado en el color principal
+        return new Color(baseColor.getRed(), baseColor.getGreen(), baseColor.getBlue(), 150);
+    }
+
+    // --- DRAG AND DROP ---
 
     private void habilitarDragAndDrop() {
         DragSource ds = new DragSource();
@@ -145,8 +235,6 @@ public class UI_Ficha extends JLabel {
                 }
                 FichaTransferable transferable;
 
-                // 3. LOGICA INTELIGENTE DE ARRASTRE
-                // Si estamos en la mano, preguntamos qué fichas mover
                 if (getParent() instanceof UI_Mano) {
                     UI_Mano mano = (UI_Mano) getParent();
                     List<FichaDTO> listaParaMover = mano.obtenerFichasParaMover(UI_Ficha.this);
@@ -164,86 +252,15 @@ public class UI_Ficha extends JLabel {
                 }
                 );
             }
-        }
-        );
+        });
     }
+
+    // --- GETTERS Y SETTERS ---
 
     public void setContenedor(ContenedorFichas contenedor) {
         this.contenedor = contenedor;
     }
 
-    private void actualizarVisual() {
-        int tamanoFuenteBase = ficha.isEsComodin() ? 36 : 32;
-        int tamanoFuenteEscalado = (int) (tamanoFuenteBase * escalaActual);
-
-        if (tamanoFuenteEscalado < 8) {
-            tamanoFuenteEscalado = 8;
-        }
-
-        if (ficha.isEsComodin()) {
-            setText("O");
-            setFont(new Font("Arial", Font.BOLD, tamanoFuenteEscalado));
-            setForeground(new Color(139, 69, 19));
-        } else {
-            setText(String.valueOf(ficha.getNumero()));
-            setFont(new Font("Arial", Font.BOLD, tamanoFuenteEscalado));
-            setForeground(obtenerColorTexto());
-        }
-        setToolTipText(ficha.toString());
-    }
-
-    private Color obtenerColorFondo() {
-        if (ficha.isEsComodin()) {
-            return new Color(255, 228, 181);
-        }
-        switch (ficha.getColor().toUpperCase()) {
-            case "ROJO":
-                return new Color(255, 250, 240);
-            case "AZUL":
-                return new Color(245, 248, 255);
-            case "AMARILLO":
-                return new Color(255, 253, 240);
-            case "NEGRO":
-                return new Color(250, 250, 245);
-            default:
-                return new Color(255, 253, 240);
-        }
-    }
-
-    private Color obtenerColorTexto() {
-        switch (ficha.getColor().toUpperCase()) {
-            case "ROJO":
-                return new Color(220, 140, 90);
-            case "AZUL":
-                return new Color(100, 149, 237);
-            case "AMARILLO":
-                return new Color(218, 165, 32);
-            case "NEGRO":
-                return new Color(105, 105, 105);
-            default:
-                return new Color(139, 69, 19);
-        }
-    }
-
-    private Color obtenerColorBorde() {
-        switch (ficha.getColor().toUpperCase()) {
-            case "ROJO":
-                return new Color(220, 140, 90, 150);
-            case "AZUL":
-                return new Color(100, 149, 237, 150);
-            case "AMARILLO":
-                return new Color(218, 165, 32, 150);
-            case "NEGRO":
-                return new Color(105, 105, 105, 150);
-            default:
-                return new Color(200, 200, 200, 150);
-        }
-    }
-
-    /**
-     * Activa o desactiva el modo de error visual.
-     * @param error true para mostrar borde rojo redondeado, false para normal.
-     */
     public void setBordeError(boolean error) {
         this.tieneError = error;
         repaint();

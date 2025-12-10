@@ -1,6 +1,7 @@
 package itson.ejercerturno.vista;
 
 import itson.rummypresentacion.utils.FichaTransferable;
+import itson.rummypresentacion.utils.ContenedorFichas; // Tu clase utilidad
 import itson.rummydtos.FichaDTO;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -23,34 +24,49 @@ public class UI_Mano extends JPanel {
     private final List<UI_Ficha> fichasSeleccionadasVisualmente = new ArrayList<>();
     private final UI_Tablero tableroPanel;
     private boolean habilitado = true;
+    
+    private List<String> misColores;
+    private ContenedorFichas contenedorLogico; 
 
     private static final int ANCHO_FICHA = 60;
     private static final int GAP = 8;
 
-    public UI_Mano(UI_Tablero tableroPanel) {
-        this(tableroPanel, null);
+    public UI_Mano(UI_Tablero tableroPanel, List<String> misColores) {
+        this(tableroPanel, null, misColores);
     }
 
-    public UI_Mano(UI_Tablero tableroPanel, List<FichaDTO> fichasIniciales) {
+    public UI_Mano(UI_Tablero tableroPanel, List<FichaDTO> fichasIniciales, List<String> misColores) {
         this.tableroPanel = tableroPanel;
+        this.misColores = misColores; 
+        
+        this.contenedorLogico = new ContenedorFichas("MANO_JUGADOR");
 
         setOpaque(false);
         setLayout(new FlowLayout(FlowLayout.LEFT, GAP, 25));
 
         if (fichasIniciales != null) {
             fichas.addAll(fichasIniciales);
+            for(FichaDTO f : fichasIniciales) contenedorLogico.agregar(f);
         }
 
         configurarDropTarget();
         refrescar();
+    }
+    
+    public void setMisColores(List<String> misColores) {
+        this.misColores = misColores;
+        refrescar(); 
     }
 
     public void setFichas(List<FichaDTO> nuevas) {
         limpiarSeleccion();
 
         fichas.clear();
+        contenedorLogico.limpiar();
+        
         if (nuevas != null) {
             fichas.addAll(nuevas);
+            for(FichaDTO f : nuevas) contenedorLogico.agregar(f);
         }
         ordenar();
         refrescar();
@@ -65,6 +81,10 @@ public class UI_Mano extends JPanel {
             return;
         }
         boolean cambio = fichas.removeIf(f -> f.getId() != null && ids.contains(f.getId()));
+        
+        contenedorLogico.limpiar();
+        for(FichaDTO f : fichas) contenedorLogico.agregar(f);
+
         if (cambio) {
             ordenar();
             refrescar();
@@ -79,9 +99,7 @@ public class UI_Mano extends JPanel {
                 dtosAMover.add(ui.getFicha());
             }
         } else {
-
             limpiarSeleccion();
-
             dtosAMover.add(fichaIniciadora.getFicha());
             fichaIniciadora.setSeleccionada(true);
             fichasSeleccionadasVisualmente.add(fichaIniciadora);
@@ -110,15 +128,9 @@ public class UI_Mano extends JPanel {
 
     private void ordenar() {
         fichas.sort((f1, f2) -> {
-            if (f1.isEsComodin() && !f2.isEsComodin()) {
-                return 1;
-            }
-            if (!f1.isEsComodin() && f2.isEsComodin()) {
-                return -1;
-            }
-            if (f1.isEsComodin() && f2.isEsComodin()) {
-                return 0;
-            }
+            if (f1.isEsComodin() && !f2.isEsComodin()) return 1;
+            if (!f1.isEsComodin() && f2.isEsComodin()) return -1;
+            if (f1.isEsComodin() && f2.isEsComodin()) return 0;
 
             if (f1.getNumero() != f2.getNumero()) {
                 return Integer.compare(f1.getNumero(), f2.getNumero());
@@ -132,7 +144,7 @@ public class UI_Mano extends JPanel {
         fichasSeleccionadasVisualmente.clear();
 
         for (FichaDTO dto : fichas) {
-            UI_Ficha uiFicha = new UI_Ficha(dto);
+            UI_Ficha uiFicha = new UI_Ficha(dto, contenedorLogico, 1.0, misColores);
             this.add(uiFicha);
         }
 
@@ -145,9 +157,7 @@ public class UI_Mano extends JPanel {
     private void actualizarTamanoPanel() {
         int cantidadFichas = fichas.size();
         int anchoNecesario = (cantidadFichas * (ANCHO_FICHA + GAP)) + 50;
-
         int anchoFinal = Math.max(780, anchoNecesario);
-
         setPreferredSize(new Dimension(anchoFinal, 110));
     }
 
@@ -213,6 +223,7 @@ public class UI_Mano extends JPanel {
                     for (FichaDTO f : recibidas) {
                         if (!misIds.contains(f.getId())) {
                             fichas.add(f);
+                            contenedorLogico.agregar(f); 
                             cambio = true;
                         }
                     }
