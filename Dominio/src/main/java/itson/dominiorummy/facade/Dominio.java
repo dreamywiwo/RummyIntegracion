@@ -518,4 +518,66 @@ public class Dominio implements IDominio {
             producer.actualizarTablero(TableroMapper.toDTO(tablero));
         }
     }
+    
+    // ---------------------- REGISTRAR JUGADOR ------------------------
+
+    @Override
+    public void actualizarPerfilJugador(String id, String nombre, String avatar, List<String> colores) {
+        Jugador jugador = getJugadorById(id);
+        
+        if (jugador != null) {
+            if (existeNombre(nombre)) {
+                producer.mostrarError(id, "El nombre " + nombre + " ya está en uso.");
+                return;
+            }
+            
+            if (existeAvatar(avatar, id)) {
+                producer.mostrarError(id, "Ese avatar ya fue elegido por otro jugador.");
+                return;
+            }
+
+            jugador.setNombre(nombre);
+            jugador.setAvatarPath(avatar);
+            jugador.setColoresFichas(colores);
+            
+            producer.enviarRegistroExitoso(id);
+            
+            System.out.println("[DOMINIO] Perfil actualizado para: " + nombre);
+            
+            // Opcional: Avisar a todos que entró alguien nuevo (para actualizar lobby)
+            // producer.enviarListaJugadores(...);
+        } else {
+            System.err.println("Intento de actualizar perfil de jugador inexistente: " + id);
+        }
+    }
+    
+    private boolean existeNombre(String nombre) {
+        if (this.jugadores == null || nombre == null) {
+            return false;
+        }
+
+        for (Jugador j : this.jugadores.values()) {
+             if (j.getNombre() != null && j.getNombre().equalsIgnoreCase(nombre)) {
+                return true;
+            }
+        }
+        
+        return false; 
+    }
+    
+    private boolean existeAvatar(String avatarPath, String idDeQuienPide) {
+        if (this.jugadores == null || avatarPath == null) {
+            return false;
+        }
+
+        for (Jugador j : this.jugadores.values()) { 
+            
+            if (j.getAvatarPath() != null && 
+                j.getAvatarPath().equals(avatarPath) && 
+                !j.getId().equals(idDeQuienPide)) {
+                return true; 
+            }
+        }
+        return false;
+    }
 }

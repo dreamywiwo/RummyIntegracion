@@ -5,7 +5,7 @@
 package itson.configurarpartida.controlador;
 
 import itson.configurarpartida.modelo.ModeloConfiguracion;
-import itson.ejercerturno.controlador.ControladorTurno;
+import itson.registrarjugador.controlador.ControladorRegistro;
 import itson.rummypresentacion.utils.TipoVista;
 
 /**
@@ -15,13 +15,13 @@ import itson.rummypresentacion.utils.TipoVista;
 public class ControladorConfigurarPartida {
 
     private ModeloConfiguracion modelo;
-    private ControladorTurno siguienteControlador;
+    private ControladorRegistro siguienteControlador;
 
     public ControladorConfigurarPartida(ModeloConfiguracion modelo) {
         this.modelo = modelo;
     }
 
-    public void setSiguienteControlador(ControladorTurno siguienteControlador) {
+    public void setSiguienteControlador(ControladorRegistro siguienteControlador) {
         this.siguienteControlador = siguienteControlador;
     }
 
@@ -40,11 +40,11 @@ public class ControladorConfigurarPartida {
         modelo.enviarConfiguracionPartida(max, comodines);
     }
 
-    public void navegarAlJuego() {
+    public void navegarSiguiente() {
         if (siguienteControlador != null) {
             modelo.resetEstado();
             modelo.cambiarVista(null); 
-            siguienteControlador.iniciarJuego(); 
+            siguienteControlador.iniciarRegistro(); 
         }
     }
 
@@ -54,7 +54,7 @@ public class ControladorConfigurarPartida {
         if (siguienteControlador != null) {
             modelo.cambiarVista(null);
 
-            siguienteControlador.iniciarJuego();
+            siguienteControlador.iniciarRegistro();
         }
     }
 }

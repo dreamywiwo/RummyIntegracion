@@ -13,5 +13,6 @@ public enum TipoVista {
     CONFIGURAR_PARTIDA,
     TABLERO_JUEGO,
     REGISTRAR_JUGADOR,
-    SALA
+    SALA,
+    CONFIRMACION_REGISTRO
 }

@@ -20,7 +20,7 @@
         <module>../Broker</module>
         <module>../ConexionInterfaces</module>
         <module>../Launcher</module>
-        <module>../../../NetBeansProjects/Listener</module>
+        <module>../Listener</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

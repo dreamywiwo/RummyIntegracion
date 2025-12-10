@@ -4,6 +4,7 @@
  */
 package itson.dominiorummy.entidades;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -14,7 +15,7 @@ import java.util.UUID;
 
 public class Jugador {
     private final String id;
-    private final String nombre;
+    private String nombre;
 
     private final Mano mano;
 
@@ -23,6 +24,18 @@ public class Jugador {
     private boolean enTurno;    
     
     private boolean haTomadoFicha;
+    
+    private String avatarPath;
+    private List<String> coloresFichas;
+    
+    public Jugador() {
+        this.id = UUID.randomUUID().toString();
+        this.mano = new Mano();
+        this.yaBajo30 = false;
+        this.haTerminado = false;
+        this.enTurno = false;
+        this.nombre = null;
+    }
 
     public Jugador(String nombre) {
         this.id = UUID.randomUUID().toString();
@@ -31,6 +44,7 @@ public class Jugador {
         this.yaBajo30 = false;
         this.haTerminado = false;
         this.enTurno = false;
+        this.coloresFichas = new ArrayList<>();
     }
 
     public Jugador(String id, String nombre) {
@@ -40,6 +54,7 @@ public class Jugador {
         this.yaBajo30 = false;
         this.haTerminado = false;
         this.enTurno = false;
+        this.coloresFichas = new ArrayList<>();
     }
 
     public String getId() {
@@ -48,6 +63,10 @@ public class Jugador {
 
     public String getNombre() {
         return nombre;
+    }
+    
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
     }
 
     public Mano getMano() {
@@ -84,6 +103,22 @@ public class Jugador {
 
     public void setHaTomadoFicha(boolean haTomadoFicha) {
         this.haTomadoFicha = haTomadoFicha;
+    }
+
+    public String getAvatarPath() {
+        return avatarPath;
+    }
+
+    public void setAvatarPath(String avatarPath) {
+        this.avatarPath = avatarPath;
+    }
+
+    public List<String> getColoresFichas() {
+        return coloresFichas;
+    }
+
+    public void setColoresFichas(List<String> coloresFichas) {
+        this.coloresFichas = coloresFichas;
     }
 
     public void reiniciarEstadoTurno() {

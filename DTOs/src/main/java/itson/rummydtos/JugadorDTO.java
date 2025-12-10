@@ -4,6 +4,7 @@
  */
 package itson.rummydtos;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,7 +12,7 @@ import java.util.List;
  *
  * @author Dana Chavez
  */
-public class JugadorDTO {
+public class JugadorDTO implements Serializable{
 
     private String id;
     private String nombre;          
@@ -19,8 +20,11 @@ public class JugadorDTO {
     private boolean esTurno;       
     private int cantidadFichas;     
     private List<FichaDTO> fichasMano;
+    private List<String> coloresFichas;
 
     public JugadorDTO() {
+        this.fichasMano = new ArrayList<>();
+        this.coloresFichas = new ArrayList<>();
     }
 
     public JugadorDTO(String id, String nombre, String avatarPath) {
@@ -93,5 +97,18 @@ public class JugadorDTO {
         if (fichasMano != null) {
             this.cantidadFichas = fichasMano.size();
         }
+    }
+    
+    public List<String> getColoresFichas() {
+        return coloresFichas;
+    }
+
+    public void setColoresFichas(List<String> coloresFichas) {
+        this.coloresFichas = coloresFichas;
+    }
+    
+    @Override
+    public String toString() {
+        return "JugadorDTO{" + "nombre=" + nombre + ", avatar=" + avatarPath + ", colores=" + coloresFichas + '}';
     }
 }

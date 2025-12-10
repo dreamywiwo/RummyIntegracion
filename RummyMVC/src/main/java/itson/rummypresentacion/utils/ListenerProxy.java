@@ -9,6 +9,7 @@ import itson.rummydtos.JugadorDTO;
 import itson.rummydtos.TableroDTO;
 import itson.rummylistener.interfaces.IConfiguracionListener;
 import itson.rummylistener.interfaces.IGameGlobalListener;
+import itson.rummylistener.interfaces.IRegistrarListener;
 import itson.rummylistener.interfaces.ITurnoListener;
 import java.util.List;
 
@@ -20,14 +21,23 @@ public class ListenerProxy implements IGameGlobalListener {
 
     private IConfiguracionListener configListener;
     private ITurnoListener turnoListener;
+    private IRegistrarListener registroListener;
 
     public void activarModoConfiguracion(IConfiguracionListener listener) {
         this.configListener = listener;
         this.turnoListener = null;
+        this.registroListener = null;
     }
 
     public void activarModoJuego(ITurnoListener listener) {
         this.turnoListener = listener;
+        this.configListener = null;
+        this.registroListener = null;
+    }
+    
+    public void activarModoRegistro(IRegistrarListener listener) {
+        this.registroListener = listener;
+        this.turnoListener = null;
         this.configListener = null;
     }
 
@@ -75,6 +85,11 @@ public class ListenerProxy implements IGameGlobalListener {
     @Override
     public void recibirConfirmacionPartida() {
         if (configListener != null) configListener.recibirConfirmacionPartida();
+    }
+
+    @Override
+    public void recibirConfirmacionRegistro() {
+        if (registroListener != null) registroListener.recibirConfirmacionRegistro();
     }
     
 }

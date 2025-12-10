@@ -1,4 +1,5 @@
 package ensambladores;
+
 import ClaseDispatcher.ColaDispatcher;
 import ClaseDispatcher.Dispatcher;
 import ClaseDispatcher.SocketOut;
@@ -7,33 +8,47 @@ import claseReceptor.Receptor;
 import claseReceptor.SocketIN;
 import com.mycompany.conexioninterfaces.IDispatcher;
 import itson.serializer.implementacion.JsonSerializer;
-import itson.producerjugador.emitters.ConfigurarPartidaEmitter;
-import itson.producerjugador.emitters.InicializarJuegoEmitter;
-import itson.producerjugador.emitters.JugarTurnoEmitter;
+
+// Facade del Producer
 import itson.producerjugador.facade.IProducerJugador;
 import itson.producerjugador.facade.ProducerJugador;
+
+// Traducer
 import itson.traducerjugador.facade.TraducerJugador;
 import itson.traducerjugador.mappers.EventMapper;
 
+// Utils y DTOs
 import itson.rummydtos.JugadorDTO;
 import itson.rummypresentacion.utils.ListenerProxy;
 import itson.rummypresentacion.utils.SesionCliente;
 import itson.rummypresentacion.utils.TipoVista;
 
+// MVC 1: Configurar Partida
 import itson.configurarpartida.controlador.ControladorConfigurarPartida;
 import itson.configurarpartida.modelo.ModeloConfiguracion;
 import itson.configurarpartida.vista.UI_ConfigurarPartida;
 import itson.configurarpartida.vista.UI_MenuRummy;
 
+// MVC 2: Registrar Jugador (Intermedio)
+import itson.registrarjugador.controlador.ControladorRegistro;
+import itson.registrarjugador.modelo.ModeloRegistro;
+import itson.registrarjugador.vista.UI_Registro;
+
+// MVC 3: Ejercer Turno (Juego)
 import itson.ejercerturno.controlador.ControladorTurno;
 import itson.ejercerturno.modelo.ModeloEjercerTurno;
 import itson.ejercerturno.vista.UI_TurnoJugador;
 
 public class EnsambladorCliente {
 
+    /**
+     * Construye toda la aplicación cliente, conecta los MVCs y arranca la red.
+     */
     public void iniciarAplicacion(String ipBroker, int puertoBroker, String miIp, int miPuerto, String miId) {
 
-        // 1. CAPA DE INFRAESTRUCTURA DE RED
+        // ====================================================================
+        // 1. CAPA DE INFRAESTRUCTURA DE RED (SOCKETS & SERIALIZADORES)
+        // ====================================================================
         JsonSerializer jsonSerializer = new JsonSerializer();
 
         // --- SALIDA (Socket Out) ---
@@ -43,24 +58,32 @@ public class EnsambladorCliente {
         colaDispatcher.attach(socketOut);
         IDispatcher dispatcher = new Dispatcher(colaDispatcher);
 
-        // Facade Producer (Crea internamente sus Emitters)
+        // Facade Producer (Crea sus emitters internamente)
         IProducerJugador producer = new ProducerJugador(jsonSerializer, dispatcher, ipBroker, puertoBroker, miId);
 
+        // ====================================================================
         // 2. PREPARACIÓN DE ENTRADA (LISTENER PROXY)
+        // ====================================================================
         ListenerProxy listenerProxy = new ListenerProxy();
 
         EventMapper eventMapper = new EventMapper(jsonSerializer);
         eventMapper.setListener(listenerProxy);
         eventMapper.setJugadorId(miId);
 
+        // ====================================================================
         // 3. SESIÓN COMPARTIDA Y DATOS INICIALES
+        // ====================================================================
+        // Valores por defecto
         String rutaAvatar = (miPuerto % 2 == 0) ? "/imageFish.png" : "/imageBun.png";
         String nombreJugador = "Jugador " + (miPuerto % 100);
         JugadorDTO perfil = new JugadorDTO(miId, nombreJugador, rutaAvatar);
 
+        // Creamos la sesión para pasar dependencias entre controladores
         SesionCliente sesion = new SesionCliente(producer, perfil, listenerProxy);
 
-        // 4. CONSTRUCCIÓN MVC 2: EJERCER TURNO
+        // ====================================================================
+        // 4. CONSTRUCCIÓN MVC 3: EJERCER TURNO (DESTINO FINAL)
+        // ====================================================================
         ModeloEjercerTurno modeloJuego = new ModeloEjercerTurno(producer);
         modeloJuego.setJugadorLocal(miId);
 
@@ -70,11 +93,28 @@ public class EnsambladorCliente {
         modeloJuego.suscribir(vistaJuego);
         vistaJuego.setVisible(false);
 
-        // 5. CONSTRUCCIÓN MVC 1: CONFIGURAR PARTIDA
+        // ====================================================================
+        // 5. CONSTRUCCIÓN MVC 2: REGISTRAR JUGADOR (INTERMEDIO)
+        // ====================================================================
+        ModeloRegistro modeloRegistro = new ModeloRegistro(producer);
+        ControladorRegistro ctrlRegistro = new ControladorRegistro(modeloRegistro, sesion);
+        
+        // CONEXIÓN: Registro -> Juego
+        ctrlRegistro.setSiguienteControlador(ctrlJuego);
+
+        // CREACIÓN DE LA VISTA DE REGISTRO (Esto faltaba antes)
+        UI_Registro vistaRegistro = new UI_Registro(ctrlRegistro);
+        modeloRegistro.suscribir(vistaRegistro);
+        vistaRegistro.setVisible(false);
+
+        // ====================================================================
+        // 6. CONSTRUCCIÓN MVC 1: CONFIGURAR PARTIDA (INICIO)
+        // ====================================================================
         ModeloConfiguracion modeloConfig = new ModeloConfiguracion(producer);
         ControladorConfigurarPartida ctrlConfig = new ControladorConfigurarPartida(modeloConfig);
 
-        ctrlConfig.setSiguienteControlador(ctrlJuego);
+        // CONEXIÓN: Configurar -> Registro
+        ctrlConfig.setSiguienteControlador(ctrlRegistro);
 
         UI_MenuRummy vistaMenu = new UI_MenuRummy(ctrlConfig);
         UI_ConfigurarPartida vistaConfig = new UI_ConfigurarPartida(ctrlConfig);
@@ -82,9 +122,12 @@ public class EnsambladorCliente {
         modeloConfig.suscribir(vistaMenu);
         modeloConfig.suscribir(vistaConfig);
 
+        // Configuración inicial del Proxy: Escuchar eventos de configuración
         listenerProxy.activarModoConfiguracion(modeloConfig);
 
-        // 6. ARRANCAR RED ENTRANTE (SOCKET IN)
+        // ====================================================================
+        // 7. ARRANCAR RED ENTRANTE (SOCKET IN)
+        // ====================================================================
         TraducerJugador traducer = new TraducerJugador(jsonSerializer, eventMapper);
         Receptor receptor = new Receptor(traducer);
         ColaReceptor colaReceptor = new ColaReceptor();
@@ -95,11 +138,14 @@ public class EnsambladorCliente {
 
         System.out.println("Ensamblador: Cliente " + nombreJugador + " (" + miId + ") iniciado en " + miIp + ":" + miPuerto);
 
-        // 7. INICIO DEL FLUJO
-        // Usamos el Producer para registrar, ya no necesitamos el emitter suelto
+        // ====================================================================
+        // 8. INICIO DEL FLUJO
+        // ====================================================================
+        // Enviamos registro al broker (Handshake)
         producer.registrarJugador(miId, miIp, miPuerto);
         System.out.println("Ensamblador: Solicitud de registro enviada.");
 
+        // Mostramos el menú inicial
         modeloConfig.cambiarVista(TipoVista.MENU_PRINCIPAL);
     }
 }

@@ -15,7 +15,9 @@ itson\rummyeventos\acciones\GrupoCreadoEvent.class
 itson\rummyeventos\acciones\TerminoTurnoEvent.class
 itson\rummyeventos\actualizaciones\PartidaCreadaExitoEvent.class
 itson\rummyeventos\actualizaciones\ManoActualizadaEvent.class
+itson\rummyeventos\actualizaciones\RegistroExitosoEvent.class
 itson\rummyeventos\base\Event.class
+itson\rummyeventos\acciones\PerfilActualizadoEvent.class
 itson\rummyeventos\acciones\EstadoSolicitadoEvent.class
 itson\rummyeventos\actualizaciones\JuegoTerminadoEvent.class
 itson\rummyeventos\actualizaciones\TurnoTerminadoEvent.class

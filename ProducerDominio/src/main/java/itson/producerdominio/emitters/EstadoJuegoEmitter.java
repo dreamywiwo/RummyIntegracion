@@ -14,6 +14,7 @@ import itson.rummyeventos.actualizaciones.InvalidGroupEvent;
 import itson.rummyeventos.actualizaciones.JuegoTerminadoEvent;
 import itson.rummyeventos.actualizaciones.ManoActualizadaEvent;
 import itson.rummyeventos.actualizaciones.PartidaCreadaExitoEvent;
+import itson.rummyeventos.actualizaciones.RegistroExitosoEvent;
 import itson.rummyeventos.actualizaciones.SopaActualizadaEvent;
 import itson.rummyeventos.actualizaciones.TableroActualizadoEvent;
 import itson.rummyeventos.actualizaciones.TurnoTerminadoEvent;
@@ -72,6 +73,11 @@ public class EstadoJuegoEmitter extends BaseEmitter {
 
     public void emitirPartidaCreadaEvent() {
         PartidaCreadaExitoEvent event = new PartidaCreadaExitoEvent();
+        enviarEvento(event);
+    }
+
+    public void emitirRegistroExitosoEvent(String id) {
+        RegistroExitosoEvent event = new RegistroExitosoEvent(id);
         enviarEvento(event);
     }
 }

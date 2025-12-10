@@ -35,4 +35,6 @@ public interface IProducerDominio {
 
     public void enviarPartidaCreada();
 
+    public void enviarRegistroExitoso(String id);
+
 }

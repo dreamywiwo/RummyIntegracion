@@ -31,4 +31,6 @@ public interface IDominio {
     public void configurarPartida(int maxNumFichas, int cantidadComodines);
     
     public void procesarSolicitudEstado(String jugadorId);
+    
+    public void actualizarPerfilJugador(String id, String nombre, String avatar, List<String> colores);
 }

@@ -19,7 +19,6 @@ public class JugarTurnoEmitter extends BaseEmitter {
 
     public void emitirGrupoCreadoEvent(List<FichaDTO> fichas) {
         GrupoCreadoEvent event = new GrupoCreadoEvent(fichas);
-        System.out.println("hasta aqui llego el grupo creado" + fichas);
         enviarEvento(event);
     }
 

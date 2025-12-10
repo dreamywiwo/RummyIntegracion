@@ -5,6 +5,7 @@ import itson.rummyeventos.actualizaciones.ErrorEvent;
 import itson.rummyeventos.actualizaciones.InvalidGroupEvent;
 import itson.rummyeventos.actualizaciones.JuegoTerminadoEvent;
 import itson.rummyeventos.actualizaciones.ManoActualizadaEvent;
+import itson.rummyeventos.actualizaciones.RegistroExitosoEvent;
 import itson.rummyeventos.actualizaciones.SopaActualizadaEvent;
 import itson.rummyeventos.actualizaciones.TableroActualizadoEvent;
 import itson.rummyeventos.actualizaciones.TurnoTerminadoEvent;
@@ -36,6 +37,7 @@ public class EventMapper {
         register("grupo.invalido", this::handleHighlightInvalidGroup);
         register("fichas.jugador.cantidad", this::handleCantidadFichas);
         register("partida.creada", this::handlePartidaCreadaExitosamente);
+        register("registro.exitoso", this::handleJugadorRegistradoExitosamente);
 
     }
 
@@ -174,6 +176,23 @@ public class EventMapper {
         try {
             if (listener != null) {
                 listener.recibirConfirmacionPartida();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    private void handleJugadorRegistradoExitosamente(String rawPayload, ISerializer serializer){
+        try {
+            
+            RegistroExitosoEvent event = serializer.deserialize(rawPayload, RegistroExitosoEvent.class);
+            
+            if (!event.getJugadorId().equals(miJugadorId)) {
+                return; 
+            }
+            
+            if (listener != null) {
+                listener.recibirConfirmacionRegistro();
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -76,4 +76,9 @@ public class ProducerDominio implements IProducerDominio {
         estadoJuegoEmitter.emitirPartidaCreadaEvent();
     }
 
+    @Override
+    public void enviarRegistroExitoso(String id) {
+        estadoJuegoEmitter.emitirRegistroExitosoEvent(id);
+    }
+
 }

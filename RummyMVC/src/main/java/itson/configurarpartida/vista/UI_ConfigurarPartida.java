@@ -165,7 +165,7 @@ public class UI_ConfigurarPartida extends javax.swing.JFrame implements IObserve
                 this.setVisible(false);
                 this.dispose();
 
-                controlador.navegarAlJuego();
+                controlador.navegarSiguiente();
                 return;
             }
 
