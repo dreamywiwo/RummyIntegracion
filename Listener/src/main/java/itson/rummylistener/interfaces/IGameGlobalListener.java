@@ -8,6 +8,6 @@ package itson.rummylistener.interfaces;
  *
  * @author Dana Chavez
  */
-public interface IGameGlobalListener extends IConfiguracionListener, ITurnoListener, IRegistrarListener {
+public interface IGameGlobalListener extends IConfiguracionListener, ITurnoListener, IRegistrarListener, ISalaListener {
     
 }

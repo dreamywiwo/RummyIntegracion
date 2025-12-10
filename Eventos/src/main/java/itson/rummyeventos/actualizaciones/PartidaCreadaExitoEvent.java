@@ -12,10 +12,27 @@ import itson.rummyeventos.base.EventBase;
  */
 public class PartidaCreadaExitoEvent extends EventBase {
     
+    private String jugadorId;
+    
     public static final String TOPIC = "actualizaciones.estado";
     public static final String EVENT_TYPE = "partida.creada";
 
     public PartidaCreadaExitoEvent () {
         super(TOPIC, EVENT_TYPE);
     }
+
+    public PartidaCreadaExitoEvent(String jugadorId) {
+        super(TOPIC, EVENT_TYPE);
+        this.jugadorId = jugadorId;
+    }
+
+    public String getJugadorId() {
+        return jugadorId;
+    }
+
+    public void setJugadorId(String jugadorId) {
+        this.jugadorId = jugadorId;
+    }
+    
+    
 }

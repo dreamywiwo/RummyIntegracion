@@ -15,6 +15,14 @@ public class Turno {
     }
 
     public Jugador getJugadorActual() {
+        if (ordenJugadores == null || ordenJugadores.isEmpty()) {
+            return null; 
+        }
+        
+        if (indiceJugadorActual < 0 || indiceJugadorActual >= ordenJugadores.size()) {
+            return null;
+        }
+
         return ordenJugadores.get(indiceJugadorActual);
     }
 

@@ -5,10 +5,13 @@ import itson.rummyeventos.actualizaciones.ErrorEvent;
 import itson.rummyeventos.actualizaciones.InvalidGroupEvent;
 import itson.rummyeventos.actualizaciones.JuegoTerminadoEvent;
 import itson.rummyeventos.actualizaciones.ManoActualizadaEvent;
+import itson.rummyeventos.actualizaciones.PartidaCreadaExitoEvent;
 import itson.rummyeventos.actualizaciones.RegistroExitosoEvent;
+import itson.rummyeventos.actualizaciones.SalaActualizadaEvent;
 import itson.rummyeventos.actualizaciones.SopaActualizadaEvent;
 import itson.rummyeventos.actualizaciones.TableroActualizadoEvent;
 import itson.rummyeventos.actualizaciones.TurnoTerminadoEvent;
+import itson.rummyeventos.actualizaciones.UnionExitosaEvent;
 import itson.rummyeventos.base.EventBase;
 import itson.rummylistener.interfaces.IGameGlobalListener;
 import itson.serializer.interfaces.ISerializer;
@@ -38,6 +41,8 @@ public class EventMapper {
         register("fichas.jugador.cantidad", this::handleCantidadFichas);
         register("partida.creada", this::handlePartidaCreadaExitosamente);
         register("registro.exitoso", this::handleJugadorRegistradoExitosamente);
+        register("union.exitosa", this::handleJugadorAceptado);
+        register("sala.actualizada", this::handleSalaActualizada);
 
     }
 
@@ -174,6 +179,13 @@ public class EventMapper {
     
     private void handlePartidaCreadaExitosamente(String rawPayload, ISerializer serializer){
         try {
+            
+            PartidaCreadaExitoEvent event = serializer.deserialize(rawPayload, PartidaCreadaExitoEvent.class);
+            
+            if (!event.getJugadorId().equals(miJugadorId)) {
+                return; 
+            }
+            
             if (listener != null) {
                 listener.recibirConfirmacionPartida();
             }
@@ -198,4 +210,30 @@ public class EventMapper {
             e.printStackTrace();
         }
     }
+    
+    private void handleJugadorAceptado(String rawPayload, ISerializer serializer){
+        try {
+            
+            UnionExitosaEvent event = serializer.deserialize(rawPayload, UnionExitosaEvent.class);
+            
+            if (!event.getJugadorId().equals(miJugadorId)) {
+                return; 
+            }
+            
+            if (listener != null) {
+                listener.recibirConfirmacionUnion();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    private void handleSalaActualizada(String json, ISerializer serializer) {
+    try {
+        SalaActualizadaEvent event = serializer.deserialize(json, SalaActualizadaEvent.class);
+        if (listener != null) {
+            listener.recibirActualizacionSala(event.getJugadores());
+        }
+    } catch (Exception e) { e.printStackTrace(); }
+}
 }

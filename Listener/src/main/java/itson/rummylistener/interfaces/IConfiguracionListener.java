@@ -12,4 +12,5 @@ package itson.rummylistener.interfaces;
 public interface IConfiguracionListener {
     public abstract void recibirError(String mensaje);
     public abstract void recibirConfirmacionPartida();
+    public abstract void recibirConfirmacionUnion();
 }

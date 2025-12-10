@@ -33,8 +33,9 @@ public class UI_Registro extends JFrame implements IObserverRegistro {
 
             if (modelo.isRegistroExitoso()) {
                 this.setVisible(false);
+                panelFormulario.setVisible(false);
                 this.dispose();
-                controlador.navegarAlJuego();
+                controlador.navegarSiguiente();
                 return;
             }
 

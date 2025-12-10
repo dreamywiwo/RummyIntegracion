@@ -17,6 +17,7 @@ import itson.configurarpartida.modelo.IObserverConfiguracion;
 public class UI_MenuRummy extends javax.swing.JFrame implements IObserverConfiguracion {
 
     private ControladorConfigurarPartida controlador;
+    private boolean navegando = false;
 
     /**
      * Creates new form MenuRummy
@@ -101,12 +102,31 @@ public class UI_MenuRummy extends javax.swing.JFrame implements IObserverConfigu
 
     @Override
     public void update(IModeloConfiguracion modelo) {
-        SwingUtilities.invokeLater(() -> {
+        SwingUtilities.invokeLater(() -> {         
+            if (navegando) {
+                return;
+            }
+            
+            if (modelo.getMensajeError() != null) {
+                javax.swing.JOptionPane.showMessageDialog(this, modelo.getMensajeError());
+                return;
+            }
+            
             if (modelo.getVistaActual() == TipoVista.MENU_PRINCIPAL) {
                 this.setVisible(true);
             } else {
                 this.setVisible(false);
             }
+
+            if (modelo.isUnionExitosa()) {
+                navegando = true; 
+                this.setVisible(false);
+                this.dispose();
+                controlador.navegarSiguiente();
+                return;
+            }
+
+            
         });
     }
 }

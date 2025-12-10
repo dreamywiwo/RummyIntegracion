@@ -1,4 +1,5 @@
 C:\Users\Dana Chavez\OneDrive\Documents\GitHub\RummyIntegracion\RummyMVC\src\main\java\itson\ejercerturno\modelo\IModeloEjercerTurno.java
+C:\Users\Dana Chavez\OneDrive\Documents\GitHub\RummyIntegracion\RummyMVC\src\main\java\itson\solicitarinicio\controlador\ControladorSalaEspera.java
 C:\Users\Dana Chavez\OneDrive\Documents\GitHub\RummyIntegracion\RummyMVC\src\main\java\itson\ejercerturno\vista\UI_Mano.java
 C:\Users\Dana Chavez\OneDrive\Documents\GitHub\RummyIntegracion\RummyMVC\src\main\java\itson\ejercerturno\vista\UI_Jugador.java
 C:\Users\Dana Chavez\OneDrive\Documents\GitHub\RummyIntegracion\RummyMVC\src\main\java\itson\registrarjugador\modelo\ModeloRegistro.java
@@ -12,8 +13,10 @@ C:\Users\Dana Chavez\OneDrive\Documents\GitHub\RummyIntegracion\RummyMVC\src\mai
 C:\Users\Dana Chavez\OneDrive\Documents\GitHub\RummyIntegracion\RummyMVC\src\main\java\itson\ejercerturno\vista\UI_Grupo.java
 C:\Users\Dana Chavez\OneDrive\Documents\GitHub\RummyIntegracion\RummyMVC\src\main\java\itson\registrarjugador\controlador\ControladorRegistro.java
 C:\Users\Dana Chavez\OneDrive\Documents\GitHub\RummyIntegracion\RummyMVC\src\main\java\itson\rummypresentacion\utils\FichaTransferable.java
+C:\Users\Dana Chavez\OneDrive\Documents\GitHub\RummyIntegracion\RummyMVC\src\main\java\itson\solicitarinicio\modelo\ISubjectSalaEspera.java
 C:\Users\Dana Chavez\OneDrive\Documents\GitHub\RummyIntegracion\RummyMVC\src\main\java\itson\ejercerturno\modelo\ISubject.java
 C:\Users\Dana Chavez\OneDrive\Documents\GitHub\RummyIntegracion\RummyMVC\src\main\java\itson\registrarjugador\vista\UI_Registro.java
+C:\Users\Dana Chavez\OneDrive\Documents\GitHub\RummyIntegracion\RummyMVC\src\main\java\itson\solicitarinicio\modelo\IObserverSalaEspera.java
 C:\Users\Dana Chavez\OneDrive\Documents\GitHub\RummyIntegracion\RummyMVC\src\main\java\itson\ejercerturno\modelo\ModeloEjercerTurno.java
 C:\Users\Dana Chavez\OneDrive\Documents\GitHub\RummyIntegracion\RummyMVC\src\main\java\itson\registrarjugador\vista\DialogoSelectorColor.java
 C:\Users\Dana Chavez\OneDrive\Documents\GitHub\RummyIntegracion\RummyMVC\src\main\java\itson\configurarpartida\modelo\ModeloConfiguracion.java
@@ -22,6 +25,9 @@ C:\Users\Dana Chavez\OneDrive\Documents\GitHub\RummyIntegracion\RummyMVC\src\mai
 C:\Users\Dana Chavez\OneDrive\Documents\GitHub\RummyIntegracion\RummyMVC\src\main\java\itson\ejercerturno\modelo\IObserver.java
 C:\Users\Dana Chavez\OneDrive\Documents\GitHub\RummyIntegracion\RummyMVC\src\main\java\itson\configurarpartida\vista\UI_MenuRummy.java
 C:\Users\Dana Chavez\OneDrive\Documents\GitHub\RummyIntegracion\RummyMVC\src\main\java\itson\registrarjugador\vista\PanelConfirmacion.java
+C:\Users\Dana Chavez\OneDrive\Documents\GitHub\RummyIntegracion\RummyMVC\src\main\java\itson\solicitarinicio\vista\PanelJugadorSala.java
+C:\Users\Dana Chavez\OneDrive\Documents\GitHub\RummyIntegracion\RummyMVC\src\main\java\itson\solicitarinicio\modelo\IModeloSalaEspera.java
+C:\Users\Dana Chavez\OneDrive\Documents\GitHub\RummyIntegracion\RummyMVC\src\main\java\itson\solicitarinicio\vista\UI_SalaEspera.java
 C:\Users\Dana Chavez\OneDrive\Documents\GitHub\RummyIntegracion\RummyMVC\src\main\java\itson\registrarjugador\modelo\IObserverRegistro.java
 C:\Users\Dana Chavez\OneDrive\Documents\GitHub\RummyIntegracion\RummyMVC\src\main\java\itson\registrarjugador\modelo\ISubjectRegistro.java
 C:\Users\Dana Chavez\OneDrive\Documents\GitHub\RummyIntegracion\RummyMVC\src\main\java\itson\configurarpartida\modelo\ISubjectConfiguracion.java
@@ -35,3 +41,4 @@ C:\Users\Dana Chavez\OneDrive\Documents\GitHub\RummyIntegracion\RummyMVC\src\mai
 C:\Users\Dana Chavez\OneDrive\Documents\GitHub\RummyIntegracion\RummyMVC\src\main\java\itson\configurarpartida\modelo\IModeloConfiguracion.java
 C:\Users\Dana Chavez\OneDrive\Documents\GitHub\RummyIntegracion\RummyMVC\src\main\java\itson\configurarpartida\vista\UI_ConfigurarPartida.java
 C:\Users\Dana Chavez\OneDrive\Documents\GitHub\RummyIntegracion\RummyMVC\src\main\java\itson\rummypresentacion\utils\EstiloSliderRummy.java
+C:\Users\Dana Chavez\OneDrive\Documents\GitHub\RummyIntegracion\RummyMVC\src\main\java\itson\solicitarinicio\modelo\ModeloSalaEspera.java

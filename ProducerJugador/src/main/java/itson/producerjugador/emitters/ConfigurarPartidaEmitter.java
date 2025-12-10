@@ -10,8 +10,8 @@ public class ConfigurarPartidaEmitter extends BaseEmitter {
         super(jsonSerializer, dispatcher, brokerIp, brokerPort);
     }
 
-    public void emitirPartidaConfiguradaEvent(int maxNumFichas, int cantidadComodines) {
-        PartidaConfiguradaEvent event = new PartidaConfiguradaEvent(maxNumFichas, cantidadComodines);
+    public void emitirPartidaConfiguradaEvent(String idJugadorSolicitante, int maxNumFichas, int cantidadComodines) {
+        PartidaConfiguradaEvent event = new PartidaConfiguradaEvent(idJugadorSolicitante, maxNumFichas, cantidadComodines);
         enviarEvento(event); 
     }
 }

@@ -4,13 +4,11 @@
  */
 package itson.dominiorummy.entidades;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-/**
- *
- * @author Adrián
- */
+
 public class Sopa {
 
     private final List<Ficha> fichas;
@@ -20,26 +18,38 @@ public class Sopa {
         this.fichas = fichas;
     }
 
+    public void setFichas(List<Ficha> nuevasFichas) {
+        this.fichas.clear();
+        if (nuevasFichas != null) {
+            this.fichas.addAll(nuevasFichas);
+        }
+    }
+
+    /**
+     * Mezcla las fichas aleatoriamente.
+     */
+    public void mezclar() {
+        Collections.shuffle(this.fichas);
+    }
+
     public Ficha tomarFicha() {
         if (fichas.isEmpty()) {
-            return null; 
+            return null;
         }
-        
+
         int indice = random.nextInt(fichas.size());
         return fichas.remove(indice);
     }
 
     public void agregarFicha(Ficha ficha) {
         fichas.add(ficha);
-        System.out.println("La ficha ha sido añadida");
     }
 
     public void descartarFicha(Ficha ficha) {
         fichas.remove(ficha);
     }
-    
+
     public int getFichasRestantes() {
         return fichas.size();
     }
-
 }

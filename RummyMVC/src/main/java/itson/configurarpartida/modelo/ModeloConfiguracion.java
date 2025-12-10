@@ -23,6 +23,7 @@ public class ModeloConfiguracion implements IModeloConfiguracion, ISubjectConfig
     private TipoVista vistaActual = TipoVista.MENU_PRINCIPAL;
     private String mensajeError;
     private boolean configuracionExitosa = false;
+    private boolean unionExitosa = false;
 
     public ModeloConfiguracion(IProducerJugador producer) {
         this.producer = producer;
@@ -41,14 +42,21 @@ public class ModeloConfiguracion implements IModeloConfiguracion, ISubjectConfig
         notificarObservers();
     }
 
-    public void enviarConfiguracionPartida(int maxNumFichas, int cantidadComodines) {
+    public void enviarConfiguracionPartida(String miId, int maxNumFichas, int cantidadComodines) {
         try {
-            producer.configurarPartida(maxNumFichas, cantidadComodines);
+            producer.configurarPartida(miId, maxNumFichas, cantidadComodines);
 
-            // this.vistaActual = TipoVista.REGISTRAR_JUGADOR; // una vez que este implementado
-            // notificarObservers();
         } catch (Exception e) {
             this.mensajeError = "Error al comunicar con el servidor";
+            notificarObservers();
+        }
+    }
+    
+    public void solicitarUnirse(String miId) {
+        try {
+            producer.solicitarUnirsePartida(miId);
+        } catch (Exception e) {
+            this.mensajeError = "Error al conectar con servidor.";
             notificarObservers();
         }
     }
@@ -67,6 +75,11 @@ public class ModeloConfiguracion implements IModeloConfiguracion, ISubjectConfig
     @Override
     public boolean isConfiguracionExitosa() {
         return configuracionExitosa;
+    }
+    
+    @Override
+    public boolean isUnionExitosa(){
+        return unionExitosa;
     }
 
     // OBSERVER
@@ -106,5 +119,12 @@ public class ModeloConfiguracion implements IModeloConfiguracion, ISubjectConfig
     public void resetEstado() {
         this.configuracionExitosa = false;
         this.mensajeError = null;
+    }
+
+    @Override
+    public void recibirConfirmacionUnion() {
+        this.unionExitosa = true;
+        this.mensajeError = null;
+        notificarObservers();
     }
 }

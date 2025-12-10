@@ -6,6 +6,7 @@ package itson.configurarpartida.controlador;
 
 import itson.configurarpartida.modelo.ModeloConfiguracion;
 import itson.registrarjugador.controlador.ControladorRegistro;
+import itson.rummypresentacion.utils.SesionCliente;
 import itson.rummypresentacion.utils.TipoVista;
 
 /**
@@ -16,9 +17,11 @@ public class ControladorConfigurarPartida {
 
     private ModeloConfiguracion modelo;
     private ControladorRegistro siguienteControlador;
+    private SesionCliente sesion;
 
-    public ControladorConfigurarPartida(ModeloConfiguracion modelo) {
+    public ControladorConfigurarPartida(ModeloConfiguracion modelo, SesionCliente sesion) {
         this.modelo = modelo;
+        this.sesion = sesion;
     }
 
     public void setSiguienteControlador(ControladorRegistro siguienteControlador) {
@@ -37,7 +40,8 @@ public class ControladorConfigurarPartida {
     // Acción de Negocio 
     public void confirmarConfiguracion(int max, int comodines) {
         modelo.resetEstado(); 
-        modelo.enviarConfiguracionPartida(max, comodines);
+        String miId = sesion.getJugadorLocal().getId();
+        modelo.enviarConfiguracionPartida(miId, max, comodines);
     }
 
     public void navegarSiguiente() {
@@ -49,12 +53,8 @@ public class ControladorConfigurarPartida {
     }
 
     public void unirseAPartida() {
-        System.out.println("[CtrlConfig] Uniéndose a partida existente...");
-
-        if (siguienteControlador != null) {
-            modelo.cambiarVista(null);
-
-            siguienteControlador.iniciarRegistro();
-        }
+        
+        String miId = sesion.getJugadorLocal().getId();
+        modelo.solicitarUnirse(miId);
     }
 }

@@ -1,6 +1,7 @@
 itson\registrarjugador\vista\AvatarComponent.class
 itson\registrarjugador\modelo\ISubjectRegistro.class
 itson\registrarjugador\modelo\ModeloRegistro.class
+itson\solicitarinicio\vista\UI_SalaEspera.class
 itson\registrarjugador\controlador\ControladorRegistro.class
 itson\ejercerturno\vista\UI_TurnoJugador$PanelBloqueo$2.class
 itson\configurarpartida\modelo\ModeloConfiguracion.class
@@ -10,15 +11,20 @@ itson\rummypresentacion\utils\SesionCliente.class
 itson\configurarpartida\controlador\ControladorConfigurarPartida.class
 itson\ejercerturno\vista\UI_Ficha$2.class
 itson\registrarjugador\vista\AvatarComponent$1.class
+itson\solicitarinicio\vista\PanelJugadorSala.class
 itson\registrarjugador\modelo\IObserverRegistro.class
 itson\configurarpartida\modelo\ISubjectConfiguracion.class
+itson\solicitarinicio\modelo\IModeloSalaEspera.class
 itson\ejercerturno\vista\UI_Mano$1.class
 itson\ejercerturno\vista\UI_TurnoJugador$PanelBloqueo.class
+itson\solicitarinicio\modelo\ISubjectSalaEspera.class
 itson\registrarjugador\vista\AvatarComponent$AvatarClickListener.class
 itson\rummypresentacion\utils\FichaTransferable.class
 itson\rummypresentacion\utils\TableroSlideWrapper$1.class
 itson\ejercerturno\modelo\IObserver.class
 itson\ejercerturno\vista\UI_TurnoJugador$PanelBloqueo$1.class
+itson\solicitarinicio\modelo\IObserverSalaEspera.class
+itson\solicitarinicio\controlador\ControladorSalaEspera.class
 itson\configurarpartida\vista\UI_ConfigurarPartida$1.class
 itson\rummypresentacion\utils\SlideWrapper.class
 itson\ejercerturno\vista\UI_Ficha$1.class
@@ -34,6 +40,7 @@ itson\rummypresentacion\utils\TipoVista.class
 itson\ejercerturno\vista\UI_Mano.class
 itson\configurarpartida\vista\UI_MenuRummy$1.class
 itson\configurarpartida\modelo\IObserverConfiguracion.class
+itson\solicitarinicio\modelo\ModeloSalaEspera.class
 itson\ejercerturno\vista\UI_Grupo.class
 itson\ejercerturno\vista\UI_Ficha.class
 itson\ejercerturno\vista\UI_Grupo$1.class

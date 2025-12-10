@@ -15,9 +15,11 @@ import itson.rummyeventos.actualizaciones.JuegoTerminadoEvent;
 import itson.rummyeventos.actualizaciones.ManoActualizadaEvent;
 import itson.rummyeventos.actualizaciones.PartidaCreadaExitoEvent;
 import itson.rummyeventos.actualizaciones.RegistroExitosoEvent;
+import itson.rummyeventos.actualizaciones.SalaActualizadaEvent;
 import itson.rummyeventos.actualizaciones.SopaActualizadaEvent;
 import itson.rummyeventos.actualizaciones.TableroActualizadoEvent;
 import itson.rummyeventos.actualizaciones.TurnoTerminadoEvent;
+import itson.rummyeventos.actualizaciones.UnionExitosaEvent;
 import itson.serializer.implementacion.JsonSerializer;
 import java.util.List;
 
@@ -71,13 +73,23 @@ public class EstadoJuegoEmitter extends BaseEmitter {
         enviarEvento(event);
     }
 
-    public void emitirPartidaCreadaEvent() {
-        PartidaCreadaExitoEvent event = new PartidaCreadaExitoEvent();
+    public void emitirPartidaCreadaEvent(String idJugadorSolicitante) {
+        PartidaCreadaExitoEvent event = new PartidaCreadaExitoEvent(idJugadorSolicitante);
         enviarEvento(event);
     }
 
     public void emitirRegistroExitosoEvent(String id) {
         RegistroExitosoEvent event = new RegistroExitosoEvent(id);
+        enviarEvento(event);
+    }
+
+    public void emitirUnionExitosaEvent(String jugadorId) {
+        UnionExitosaEvent event = new UnionExitosaEvent(jugadorId);
+        enviarEvento(event);
+    }
+
+    public void emitirSalaActualizada(List<JugadorDTO> listaDTOs) {
+        SalaActualizadaEvent event = new SalaActualizadaEvent(listaDTOs);
         enviarEvento(event);
     }
 }

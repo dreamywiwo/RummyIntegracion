@@ -33,8 +33,12 @@ public interface IProducerDominio {
     
     public abstract void registrarDominio(String miId, String ipCliente, int miPuertoDeEscucha);
 
-    public void enviarPartidaCreada();
+    public void enviarPartidaCreada(String idJugadorSolicitante);
 
     public void enviarRegistroExitoso(String id);
+
+    public void enviarConfirmacionUnion(String jugadorId);
+
+    public void enviarActualizacionSala(List<JugadorDTO> listaDTOs);
 
 }

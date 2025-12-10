@@ -14,4 +14,5 @@ public interface IModeloConfiguracion {
     public abstract TipoVista getVistaActual();
     public abstract String getMensajeError();
     public abstract boolean isConfiguracionExitosa();
+    public abstract boolean isUnionExitosa();
 }

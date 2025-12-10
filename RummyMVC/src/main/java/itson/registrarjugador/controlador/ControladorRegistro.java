@@ -4,6 +4,7 @@ import itson.ejercerturno.controlador.ControladorTurno;
 import itson.registrarjugador.modelo.ModeloRegistro;
 import itson.rummypresentacion.utils.SesionCliente;
 import itson.rummypresentacion.utils.TipoVista;
+import itson.solicitarinicio.controlador.ControladorSalaEspera;
 import java.util.List;
 import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
@@ -11,7 +12,7 @@ import javax.swing.JOptionPane;
 public class ControladorRegistro {
 
     private ModeloRegistro modelo;
-    private ControladorTurno siguienteControlador;
+    private ControladorSalaEspera siguienteControlador;
     private SesionCliente sesion;
 
     public ControladorRegistro(ModeloRegistro modelo, SesionCliente sesion) {
@@ -19,7 +20,7 @@ public class ControladorRegistro {
         this.sesion = sesion;
     }
 
-    public void setSiguienteControlador(ControladorTurno siguienteControlador) {
+    public void setSiguienteControlador(ControladorSalaEspera siguienteControlador) {
         this.siguienteControlador = siguienteControlador;
     }
 
@@ -62,11 +63,11 @@ public class ControladorRegistro {
         }
     }
 
-    public void navegarAlJuego() {
+    public void navegarSiguiente() {
         if (siguienteControlador != null) {
             modelo.resetEstado();
             modelo.cambiarVista(null); 
-            siguienteControlador.iniciarJuego();
+            siguienteControlador.iniciarSala();
         }
     }
 

@@ -72,13 +72,23 @@ public class ProducerDominio implements IProducerDominio {
     }
 
     @Override
-    public void enviarPartidaCreada() {
-        estadoJuegoEmitter.emitirPartidaCreadaEvent();
+    public void enviarPartidaCreada(String idJugadorSolicitante) {
+        estadoJuegoEmitter.emitirPartidaCreadaEvent(idJugadorSolicitante);
     }
 
     @Override
     public void enviarRegistroExitoso(String id) {
         estadoJuegoEmitter.emitirRegistroExitosoEvent(id);
+    }
+
+    @Override
+    public void enviarConfirmacionUnion(String jugadorId) {
+        estadoJuegoEmitter.emitirUnionExitosaEvent(jugadorId);
+    }
+
+    @Override
+    public void enviarActualizacionSala(List<JugadorDTO> listaDTOs) {
+        estadoJuegoEmitter.emitirSalaActualizada(listaDTOs);
     }
 
 }

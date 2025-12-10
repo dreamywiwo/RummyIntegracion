@@ -12,6 +12,7 @@ import itson.rummyeventos.base.EventBase;
  */
 public class PartidaConfiguradaEvent extends EventBase {
     
+    private String jugadorId;
     private int maxNumFichas;
     private int cantidadComodines;
     
@@ -22,10 +23,19 @@ public class PartidaConfiguradaEvent extends EventBase {
         super();
     }
 
-    public PartidaConfiguradaEvent(int maxNumFichas, int cantidadComodines) {
+    public PartidaConfiguradaEvent(String jugadorId, int maxNumFichas, int cantidadComodines) {
         super(TOPIC, EVENT_TYPE);
+        this.jugadorId = jugadorId;
         this.maxNumFichas = maxNumFichas;
         this.cantidadComodines = cantidadComodines;
+    }
+
+    public String getJugadorId() {
+        return jugadorId;
+    }
+
+    public void setJugadorId(String jugadorId) {
+        this.jugadorId = jugadorId;
     }
 
     public int getMaxNumFichas() {

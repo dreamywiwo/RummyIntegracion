@@ -10,6 +10,7 @@ import itson.rummydtos.TableroDTO;
 import itson.rummylistener.interfaces.IConfiguracionListener;
 import itson.rummylistener.interfaces.IGameGlobalListener;
 import itson.rummylistener.interfaces.IRegistrarListener;
+import itson.rummylistener.interfaces.ISalaListener;
 import itson.rummylistener.interfaces.ITurnoListener;
 import java.util.List;
 
@@ -22,74 +23,121 @@ public class ListenerProxy implements IGameGlobalListener {
     private IConfiguracionListener configListener;
     private ITurnoListener turnoListener;
     private IRegistrarListener registroListener;
+    private ISalaListener salaListener;
 
     public void activarModoConfiguracion(IConfiguracionListener listener) {
         this.configListener = listener;
         this.turnoListener = null;
         this.registroListener = null;
+        this.salaListener = null;
     }
 
     public void activarModoJuego(ITurnoListener listener) {
         this.turnoListener = listener;
         this.configListener = null;
         this.registroListener = null;
+        this.salaListener = null;
     }
-    
+
     public void activarModoRegistro(IRegistrarListener listener) {
         this.registroListener = listener;
+        this.turnoListener = null;
+        this.configListener = null;
+        this.salaListener = null;
+    }
+
+    public void activarModoSala(ISalaListener listener) { 
+        this.salaListener = listener;
+        this.registroListener = null;
         this.turnoListener = null;
         this.configListener = null;
     }
 
     @Override
     public void recibirError(String mensaje) {
-        if (configListener != null) configListener.recibirError(mensaje);
-        if (turnoListener != null) turnoListener.recibirError(mensaje);
+        if (configListener != null) {
+            configListener.recibirError(mensaje);
+        }
+        if (turnoListener != null) {
+            turnoListener.recibirError(mensaje);
+        }
     }
 
     @Override
     public void recibirTablero(TableroDTO tablero) {
-        if (turnoListener != null) turnoListener.recibirTablero(tablero);
+        if (turnoListener != null) {
+            turnoListener.recibirTablero(tablero);
+        }
     }
 
     @Override
     public void recibirMano(List<FichaDTO> mano) {
-        if (turnoListener != null) turnoListener.recibirMano(mano);
+        if (turnoListener != null) {
+            turnoListener.recibirMano(mano);
+        }
     }
 
     @Override
     public void recibirSopa(int cantidad) {
-        if (turnoListener != null) turnoListener.recibirSopa(cantidad);
+        if (turnoListener != null) {
+            turnoListener.recibirSopa(cantidad);
+        }
     }
 
     @Override
     public void terminoTurno(String jugadorActivoId) {
-        if (turnoListener != null) turnoListener.terminoTurno(jugadorActivoId);
+        if (turnoListener != null) {
+            turnoListener.terminoTurno(jugadorActivoId);
+        }
     }
 
     @Override
     public void marcarJuegoTerminado(JugadorDTO ganador) {
-        if (turnoListener != null) turnoListener.marcarJuegoTerminado(ganador);
+        if (turnoListener != null) {
+            turnoListener.marcarJuegoTerminado(ganador);
+        }
     }
 
     @Override
     public void resaltarGrupoInvalido(String grupoId) {
-        if (turnoListener != null) turnoListener.resaltarGrupoInvalido(grupoId);
+        if (turnoListener != null) {
+            turnoListener.resaltarGrupoInvalido(grupoId);
+        }
     }
 
     @Override
     public void actualizarFichasOponente(String jugadorId, int cantidad) {
-        if (turnoListener != null) turnoListener.actualizarFichasOponente(jugadorId, cantidad);
+        if (turnoListener != null) {
+            turnoListener.actualizarFichasOponente(jugadorId, cantidad);
+        }
     }
-    
+
     @Override
     public void recibirConfirmacionPartida() {
-        if (configListener != null) configListener.recibirConfirmacionPartida();
+        if (configListener != null) {
+            configListener.recibirConfirmacionPartida();
+        }
     }
 
     @Override
     public void recibirConfirmacionRegistro() {
-        if (registroListener != null) registroListener.recibirConfirmacionRegistro();
+        if (registroListener != null) {
+            registroListener.recibirConfirmacionRegistro();
+        }
     }
-    
+
+    @Override
+    public void recibirConfirmacionUnion() {
+        if (configListener != null) {
+            configListener.recibirConfirmacionUnion();
+        }
+    }
+
+    @Override
+    public void recibirActualizacionSala(List<JugadorDTO> jugadores) {
+        if (salaListener != null) { 
+            salaListener.recibirActualizacionSala(jugadores);
+        }
+    }
+
 }

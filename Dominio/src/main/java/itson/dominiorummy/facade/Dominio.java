@@ -30,7 +30,6 @@ public class Dominio implements IDominio {
     private final IProducerDominio producer;
     private final Turno turno;
     private final Sopa sopa;
-    private final List<Ficha> fichas;
     private final Map<String, Jugador> jugadores;
     private Partida partida;
 
@@ -40,18 +39,18 @@ public class Dominio implements IDominio {
 
     private static final Logger LOG = Logger.getLogger(Dominio.class.getName());
 
-    public Dominio(Tablero tablero, IProducerDominio producer, Turno turno, Sopa sopa, List<Ficha> fichas) {
-        this.fichas = fichas;
+    public Dominio(Tablero tablero, IProducerDominio producer, Turno turno, Sopa sopa, Partida partida) {
         this.tablero = tablero;
         this.producer = producer;
         this.turno = turno;
-        this.jugadores = new HashMap<>();
         this.sopa = sopa;
+        this.partida = partida;
+        this.jugadores = new HashMap<>();
     }
 
     // ----------------------- CASO DE USO CONFIGURAR PARTIDA -------------------------------
     @Override
-    public void configurarPartida(int maxNumFichas, int cantidadComodines) {
+    public void configurarPartida(String idJugadorSolicitante, int maxNumFichas, int cantidadComodines) {
         if (validarExistenciaPartida()) {
             producer.mostrarError("Servidor", "Ya existe una partida en curso o configurada.");
             return;
@@ -67,7 +66,7 @@ public class Dominio implements IDominio {
             this.partida.configurar(maxNumFichas, cantidadComodines);
             this.partida.marcarDisponible();
 
-            producer.enviarPartidaCreada();
+            producer.enviarPartidaCreada(idJugadorSolicitante);
 
             System.out.println("[DOMINIO] Partida creada y en estado: " + this.partida.getEstado());
 
@@ -101,9 +100,14 @@ public class Dominio implements IDominio {
         producer.actualizarSopa(sopa.getFichasRestantes());
 
         // 4. Re-enviar Turno Actual
-        Jugador turnoActual = turno.getJugadorActual();
-        if (turnoActual != null) {
-            producer.actualizarTurno(turnoActual.getId());
+        if (turno != null) {
+            Jugador turnoActual = turno.getJugadorActual();
+
+            if (turnoActual != null) {
+                producer.actualizarTurno(turnoActual.getId());
+            } else {
+                System.out.println("Aún no hay turno activo.");
+            }
         }
     }
 
@@ -152,6 +156,73 @@ public class Dominio implements IDominio {
             LOG.severe("Error al iniciar la partida: " + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Lógica real de inicio de partida: Genera fichas, mezcla, reparte y
+     * arranca turnos.
+     */
+    public void prepararYArrancarJuego() {
+        System.out.println("[DOMINIO] Preparando partida...");
+
+        if (this.partida == null) {
+            System.out.println("Error: No se ha configurado la partida aún.");
+            return;
+        }
+
+        // if (jugadores.size() < 2) return;
+        int comodines = partida.getCantidadComodines();
+        if (comodines <= 0) {
+            comodines = 2;
+        }
+        List<Ficha> mazoNuevo = generarFichasRummy(comodines);
+
+        // 3. Inicializar Sopa
+        sopa.setFichas(mazoNuevo);
+        sopa.mezclar();
+
+        // 4. Establecer Turnos
+        List<Jugador> listaOrdenada = new ArrayList<>(jugadores.values());
+        java.util.Collections.shuffle(listaOrdenada);
+        turno.setOrdenJugadores(listaOrdenada);
+        turno.setIndiceJugadorActual(0);
+
+        int fichasPorJugador = partida.getMaxNumFichas();
+        if (fichasPorJugador <= 0) {
+            fichasPorJugador = 14;
+        }
+        for (Jugador j : jugadores.values()) {
+            j.getMano().getFichas().clear();
+            for (int i = 0; i < fichasPorJugador; i++) {
+                Ficha f = sopa.tomarFicha();
+                if (f != null) {
+                    j.getMano().agregarFicha(f);
+                }
+            }
+            System.out.println("[DOMINIO] Repartidas " + fichasPorJugador + " fichas a " + j.getNombre());
+        }
+
+        partida.marcarEnCurso();
+
+        iniciarPartida();
+    }
+
+    private List<Ficha> generarFichasRummy(int numComodines) {
+        List<Ficha> nuevasFichas = new ArrayList<>();
+        String[] colores = {"ROJO", "AZUL", "NEGRO", "AMARILLO"};
+
+        for (int set = 0; set < 2; set++) {
+            for (String color : colores) {
+                for (int numero = 1; numero <= 13; numero++) {
+                    String idUnico = java.util.UUID.randomUUID().toString();
+                    nuevasFichas.add(new Ficha(idUnico, numero, color, false));
+                }
+            }
+        }
+        for (int i = 0; i < numComodines; i++) {
+            nuevasFichas.add(new Ficha(java.util.UUID.randomUUID().toString(), 0, "COMODIN", true));
+        }
+        return nuevasFichas;
     }
 
     private void guardarBackupInicioTurno() {
@@ -349,13 +420,13 @@ public class Dominio implements IDominio {
 
     public Jugador getJugadorById(String id) {
         if (this.jugadores != null) {
-            for (Jugador j : this.jugadores.values()) { 
+            for (Jugador j : this.jugadores.values()) {
                 if (j.getId().equals(id)) {
                     return jugadores.get(id);
                 }
             }
         }
-        return null; 
+        return null;
     }
 
     // TERMINAR TURNO (Público)
@@ -460,19 +531,18 @@ public class Dominio implements IDominio {
             guardarBackupInicioTurno();
 
             producer.actualizarTablero(TableroMapper.toDTO(tablero));
-            
+
             producer.actualizarManoJugador(
-                jugadorId, 
-                FichaMapper.toDTO(jugadorActual.getMano().getFichas())
+                    jugadorId,
+                    FichaMapper.toDTO(jugadorActual.getMano().getFichas())
             );
 
             producer.actualizarManoJugador(
-                siguienteJugador.getId(), 
-                FichaMapper.toDTO(siguienteJugador.getMano().getFichas())
+                    siguienteJugador.getId(),
+                    FichaMapper.toDTO(siguienteJugador.getMano().getFichas())
             );
-            
+
             producer.actualizarTurno(siguienteJugador.getId());
-            
 
         } catch (Exception e) {
             LOG.severe("Error al terminar turno: " + e.getMessage());
@@ -518,66 +588,132 @@ public class Dominio implements IDominio {
             producer.actualizarTablero(TableroMapper.toDTO(tablero));
         }
     }
-    
-    // ---------------------- REGISTRAR JUGADOR ------------------------
 
+    // ---------------------- REGISTRAR JUGADOR ------------------------
     @Override
     public void actualizarPerfilJugador(String id, String nombre, String avatar, List<String> colores) {
         Jugador jugador = getJugadorById(id);
-        
-        if (jugador != null) {
-            if (existeNombre(nombre)) {
-                producer.mostrarError(id, "El nombre " + nombre + " ya está en uso.");
-                return;
-            }
-            
-            if (existeAvatar(avatar, id)) {
-                producer.mostrarError(id, "Ese avatar ya fue elegido por otro jugador.");
-                return;
-            }
 
-            jugador.setNombre(nombre);
-            jugador.setAvatarPath(avatar);
-            jugador.setColoresFichas(colores);
-            
-            producer.enviarRegistroExitoso(id);
-            
-            System.out.println("[DOMINIO] Perfil actualizado para: " + nombre);
-            
-            // Opcional: Avisar a todos que entró alguien nuevo (para actualizar lobby)
-            // producer.enviarListaJugadores(...);
-        } else {
-            System.err.println("Intento de actualizar perfil de jugador inexistente: " + id);
+        if (jugador == null) {
+            jugador = new Jugador(id, nombre); // Usamos el constructor que acepta ID
+            agregarJugador(jugador); // Lo metemos al mapa
+            System.out.println("[DOMINIO] Nuevo jugador detectado y creado: " + id);
+        }
+
+        if (existeNombre(nombre, id)) {
+            producer.mostrarError(id, "El nombre " + nombre + " ya está en uso.");
+            return;
+        }
+
+        if (existeAvatar(avatar, id)) {
+            producer.mostrarError(id, "Ese avatar ya fue elegido por otro jugador.");
+            return;
+        }
+
+        jugador.setNombre(nombre);
+        jugador.setAvatarPath(avatar);
+        jugador.setColoresFichas(colores);
+
+        producer.enviarRegistroExitoso(id);
+
+        enviarEstadoSalaATodos();
+
+        System.out.println("[DOMINIO] Perfil actualizado para: " + nombre);
+
+        long jugadoresListos = jugadores.values().stream()
+                .filter(j -> j.getNombre() != null && !j.getNombre().isEmpty())
+                .count();
+
+        if (jugadoresListos >= 2) {
+            System.out.println("[DOMINIO] Jugadores suficientes (" + jugadoresListos + "). Iniciando partida...");
+            prepararYArrancarJuego();
         }
     }
-    
-    private boolean existeNombre(String nombre) {
+
+    private void enviarEstadoSalaATodos() {
+        List<JugadorDTO> listaDTOs = new ArrayList<>();
+
+        for (Jugador j : this.jugadores.values()) {
+            if (j.getNombre() != null) {
+                JugadorDTO dto = new JugadorDTO();
+                dto.setId(j.getId());
+                dto.setNombre(j.getNombre());
+                dto.setAvatarPath(j.getAvatarPath());
+                dto.setColoresFichas(j.getColoresFichas());
+                listaDTOs.add(dto);
+            }
+        }
+
+        producer.enviarActualizacionSala(listaDTOs);
+        System.out.println("[DOMINIO] Sala actualizada enviada a " + listaDTOs.size() + " jugadores.");
+    }
+
+    private boolean existeNombre(String nombre, String idDeQuienPide) {
         if (this.jugadores == null || nombre == null) {
             return false;
         }
 
         for (Jugador j : this.jugadores.values()) {
-             if (j.getNombre() != null && j.getNombre().equalsIgnoreCase(nombre)) {
+            if (j.getNombre() != null
+                    && j.getNombre().equalsIgnoreCase(nombre)
+                    && !j.getId().equals(idDeQuienPide)) {
                 return true;
             }
         }
-        
-        return false; 
+        return false;
     }
-    
+
     private boolean existeAvatar(String avatarPath, String idDeQuienPide) {
         if (this.jugadores == null || avatarPath == null) {
             return false;
         }
 
-        for (Jugador j : this.jugadores.values()) { 
-            
-            if (j.getAvatarPath() != null && 
-                j.getAvatarPath().equals(avatarPath) && 
-                !j.getId().equals(idDeQuienPide)) {
-                return true; 
+        for (Jugador j : this.jugadores.values()) {
+            if (j.getAvatarPath() != null
+                    && j.getAvatarPath().equals(avatarPath)
+                    && !j.getId().equals(idDeQuienPide)) {
+                return true;
             }
         }
         return false;
+    }
+
+    @Override
+    public void procesarSolicitudUnion(String jugadorId) {
+        if (this.partida == null) {
+            producer.mostrarError(jugadorId, "No hay ninguna partida creada.");
+            return;
+        }
+
+        if (this.partida.getEstado() != EstadoPartida.DISPONIBLE) {
+            producer.mostrarError(jugadorId, "La partida ya inició o no está disponible.");
+            return;
+        }
+
+        if (this.jugadores.size() >= 4) {
+            producer.mostrarError(jugadorId, "La sala está llena.");
+            return;
+        }
+
+        producer.enviarConfirmacionUnion(jugadorId);
+    }
+
+    public void procesarSolicitudInfoSala(String idSolicitante) {
+        System.out.println("[DOMINIO] Enviando lista de sala a: " + idSolicitante);
+        
+        List<JugadorDTO> listaDTOs = new ArrayList<>();
+        for (Jugador j : this.jugadores.values()) {
+            
+            if (j.getNombre() != null) {
+                JugadorDTO dto = new JugadorDTO();
+                dto.setId(j.getId());
+                dto.setNombre(j.getNombre());
+                dto.setAvatarPath(j.getAvatarPath());
+                dto.setColoresFichas(j.getColoresFichas());
+                listaDTOs.add(dto);
+            }
+        }
+
+        producer.enviarActualizacionSala(listaDTOs); 
     }
 }

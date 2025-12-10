@@ -62,8 +62,8 @@ public class ProducerJugador implements IProducerJugador {
     }
 
     @Override
-    public void configurarPartida(int maxNumFichas, int cantidadComodines) {
-        configurarPartidaEmitter.emitirPartidaConfiguradaEvent(maxNumFichas, cantidadComodines);
+    public void configurarPartida(String idJugadorSolicitante, int maxNumFichas, int cantidadComodines) {
+        configurarPartidaEmitter.emitirPartidaConfiguradaEvent(idJugadorSolicitante, maxNumFichas, cantidadComodines);
     }
 
     @Override
@@ -74,6 +74,16 @@ public class ProducerJugador implements IProducerJugador {
     @Override
     public void actualizarPerfil(String id, String nombre, String avatar, List<String> colores) {
         registrarJugadorEmitter.emitirPerfilActualizadoEvent(id, nombre, avatar, colores);
+    }
+
+    @Override
+    public void solicitarUnirsePartida(String jugadorId) {
+        registrarJugadorEmitter.emitirUnirsePartidaEvent(jugadorId);
+    }
+
+    @Override
+    public void solicitarInfoSala(String id) {
+        registrarJugadorEmitter.emitirInfoSalaSolicitadaEvent(id);
     }
 
 }

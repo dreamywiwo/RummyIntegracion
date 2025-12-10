@@ -34,10 +34,18 @@ public class Partida {
     public void marcarDisponible() {
         this.estado = EstadoPartida.DISPONIBLE;
     }
+    
+    public void marcarEnCurso() {
+        this.estado = EstadoPartida.EN_CURSO;
+    }
 
     // Getters
     public EstadoPartida getEstado() {
         return estado;
+    }
+
+    public int getCantidadComodines() {
+        return cantidadComodines;
     }
 
     public int getMaxNumFichas() {

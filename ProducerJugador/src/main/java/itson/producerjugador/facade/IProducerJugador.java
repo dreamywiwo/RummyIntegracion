@@ -25,9 +25,13 @@ public interface IProducerJugador {
 
     public abstract void devolverFicha(String grupoId, String fichaId);
 
-    public abstract void configurarPartida(int maxNumFichas, int cantidadComodines);
+    public abstract void configurarPartida(String idJugadorSolicitante, int maxNumFichas, int cantidadComodines);
 
     public abstract void solicitarEstadoJuego(String idJugadorLocal);
     
     public abstract void actualizarPerfil(String id, String nombre, String avatar, List<String> colores);
+    
+    public abstract void solicitarUnirsePartida(String jugadorId);
+    
+    public abstract void solicitarInfoSala(String id);
 }
